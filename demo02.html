@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8b5cf6">
+  <title>Demo 02 – Gia sư AI EngMate</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <!-- Phông chữ & biểu tượng -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ================= DEMO 02: BIẾN MÀU SẮC ================= */
+    :root {
+      --primary: #6366f1;
+      --primary-2: #8b5cf6;
+      --primary-3: #ec4899;
+      --primary-light: #eef2ff;
+      --secondary: #10b981;
+      --secondary-light: #ecfdf5;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --bg-color: #f5f7ff;
+      --card: #ffffff;
+      --glass: rgba(255, 255, 255, .72);
+      --text-main: #1e1b4b;
+      --text-muted: #6b7280;
+      --line: #e5e7f5;
+      --shadow-sm: 0 2px 10px rgba(30, 27, 75, .06);
+      --shadow-md: 0 14px 34px rgba(99, 102, 241, .28);
+      --grad: linear-gradient(135deg, var(--primary), var(--primary-2) 55%, var(--primary-3));
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary-light: #262457; --secondary-light: #0d3326; --bg-color: #0f0e24; --card: #1b1a3a;
+        --glass: rgba(27, 26, 58, .72); --text-main: #eef0ff; --text-muted: #a5a8c9; --line: #2e2c5c;
+        --shadow-sm: none; --shadow-md: 0 14px 34px rgba(99, 102, 241, .25);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Nunito', system-ui, sans-serif; color: var(--text-main); min-height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      background:
+        radial-gradient(40rem 30rem at 15% 10%, rgba(139, 92, 246, .35), transparent 60%),
+        radial-gradient(36rem 28rem at 85% 90%, rgba(236, 72, 153, .28), transparent 60%),
+        radial-gradient(30rem 24rem at 90% 10%, rgba(16, 185, 129, .2), transparent 60%),
+        #e9ecff;
+    }
+    @media (prefers-color-scheme: dark) { body { background-color: #07061a; } }
+    button, input, textarea { font: inherit; color: inherit; }
+    a { color: inherit; }
+
+    /* Khung điện thoại: bo góc khi xem trên máy tính, toàn màn hình trên điện thoại */
+    .app-container {
+      width: 100%; max-width: 414px; height: 896px; max-height: 100vh;
+      background: var(--bg-color); position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    @media (min-width: 520px) and (min-height: 700px) {
+      .app-container { max-height: calc(100vh - 40px); border-radius: 42px; border: 8px solid #111027; box-shadow: 0 40px 80px -20px rgba(30, 27, 75, .55); }
+    }
+
+    /* ================= HEADER ================= */
+    .app-header {
+      position: relative; z-index: 10; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;
+      background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-radius: 0 0 26px 26px; box-shadow: var(--shadow-sm);
+    }
+    .user-info { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 0; }
+    .avatar {
+      width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; flex: none;
+      background: var(--grad); color: #fff; font-size: 20px; box-shadow: 0 0 0 3px var(--card), 0 0 0 5px rgba(139, 92, 246, .45);
+    }
+    .greet { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+    .user-name { font-weight: 800; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-level { font-size: 12px; color: var(--primary-2); font-weight: 800; }
+    .stats { display: flex; gap: 8px; }
+    .stat-badge {
+      display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; padding: 7px 11px; border-radius: 20px;
+      background: rgba(245, 158, 11, .14); color: var(--accent); transition: color .3s, transform .3s, background .3s;
+    }
+    .stat-badge.streak { background: rgba(239, 68, 68, .12); color: var(--danger); }
+    .stat-badge.flash { background: rgba(16, 185, 129, .16); color: var(--secondary); transform: scale(1.12); }
+
+    /* ================= NỘI DUNG ================= */
+    .app-content { flex: 1; overflow-y: auto; padding: 18px 18px 120px; scrollbar-width: none; }
+    .app-content::-webkit-scrollbar { display: none; }
+    .section-title { font-size: 17px; font-weight: 800; margin: 22px 0 12px; display: flex; justify-content: space-between; align-items: center; }
+    .section-title small { font-size: 12px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    /* Thẻ AI chính: nền chuyển màu động + quầng sáng + robot */
+    .ai-main-card {
+      position: relative; overflow: hidden; border-radius: 28px; padding: 24px; color: #fff; isolation: isolate;
+      background: var(--grad); background-size: 200% 200%; animation: hue 8s ease infinite; box-shadow: var(--shadow-md);
+    }
+    @keyframes hue { 50% { background-position: 100% 50%; } }
+    .ai-main-card .orb { position: absolute; border-radius: 50%; filter: blur(2px); z-index: -1; background: rgba(255, 255, 255, .18); animation: drift 7s ease-in-out infinite; }
+    .ai-main-card .orb.o1 { width: 140px; height: 140px; right: -40px; top: -50px; }
+    .ai-main-card .orb.o2 { width: 80px; height: 80px; right: 70px; bottom: -40px; animation-delay: -3s; }
+    @keyframes drift { 50% { transform: translate(-12px, 10px) scale(1.08); } }
+    .mascot { position: absolute; right: 18px; top: 50%; font-size: 64px; transform: translateY(-50%); animation: bob 3s ease-in-out infinite; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .25)); }
+    @keyframes bob { 50% { transform: translateY(calc(-50% - 8px)) rotate(-4deg); } }
+    .ai-main-card .pill { display: inline-block; font-size: 11px; font-weight: 800; background: rgba(255, 255, 255, .22); padding: 4px 10px; border-radius: 99px; margin-bottom: 10px; }
+    .ai-main-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .ai-main-card p { font-size: 13px; opacity: .92; margin-bottom: 16px; font-weight: 600; max-width: 62%; }
+    .btn-ai {
+      background: #fff; color: var(--primary); border: none; padding: 11px 20px; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 14px;
+      display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 8px 18px rgba(30, 27, 75, .25); transition: transform .2s;
+    }
+    .btn-ai:hover { transform: translateY(-2px); }
+    .btn-ai:active { transform: scale(.95); }
+
+    /* Mục tiêu hôm nay: vòng tiến độ + 7 ngày */
+    .goal-card { margin-top: 14px; display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow-sm); border: 1px solid var(--line); }
+    .ring { position: relative; width: 66px; height: 66px; flex: none; }
+    .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring circle { fill: none; stroke-width: 8; }
+    .ring .track { stroke: var(--line); }
+    .ring .bar { stroke: url(#ringGrad); stroke-linecap: round; transition: stroke-dashoffset .8s cubic-bezier(.3, 1.3, .5, 1); }
+    .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13px; font-weight: 800; }
+    .goal-info { flex: 1; min-width: 0; }
+    .goal-info strong { display: block; font-size: 15px; }
+    .goal-info span { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+    .week { display: flex; justify-content: space-between; margin-top: 8px; }
+    .week i { font-style: normal; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; color: var(--text-muted); }
+    .week i::before { content: ""; width: 22px; height: 22px; border-radius: 8px; background: var(--line); }
+    .week i.on::before { background: var(--grad); box-shadow: 0 4px 10px rgba(139, 92, 246, .35); }
+    .week i.today { color: var(--primary); }
+
+    /* Lưới tính năng */
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .feature-card {
+      background: var(--card); padding: 16px; border-radius: 22px; border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column; gap: 8px; text-align: left; text-decoration: none; cursor: pointer; transition: transform .2s, box-shadow .2s;
+    }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(99, 102, 241, .14); }
+    .feature-card:active { transform: scale(.96); }
+    .feature-card.row { flex-direction: row; align-items: center; gap: 12px; }
+    .feature-icon { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 18px; flex: none; color: #fff; }
+    .feature-card.row .feature-icon { width: 48px; height: 48px; font-size: 22px; }
+    .feature-title { font-weight: 800; font-size: 14px; }
+    .feature-desc { font-size: 11px; color: var(--text-muted); font-weight: 700; }
+    .fc-roleplay .feature-icon { background: linear-gradient(135deg, #f472b6, #db2777); }
+    .fc-write .feature-icon { background: linear-gradient(135deg, #818cf8, #4f46e5); }
+    .fc-pronun .feature-icon { background: linear-gradient(135deg, #34d399, #059669); }
+    .fc-srs .feature-icon { background: linear-gradient(135deg, #fbbf24, #d97706); }
+    .fc-badge .feature-icon { background: linear-gradient(135deg, #fcd34d, #f59e0b); }
+    .fc-quest .feature-icon { background: linear-gradient(135deg, #f9a8d4, #ec4899); }
+
+    /* ================= CÁC MÀN HÌNH ================= */
+    .screen { display: none; flex-direction: column; height: 100%; }
+    .screen.active { display: flex; }
+    .screen > * { flex-shrink: 0; }
+    .screen.from-right { animation: inRight .3s ease; }
+    .screen.from-left { animation: inLeft .3s ease; }
+    @keyframes inRight { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
+    @keyframes inLeft { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
+
+    button, .feature-card, .nav-item { position: relative; overflow: hidden; }
+    .ripple { position: absolute; border-radius: 50%; pointer-events: none; background: currentColor; opacity: .2; transform: scale(0); animation: ripple .5s ease-out forwards; }
+    @keyframes ripple { to { transform: scale(2.4); opacity: 0; } }
+
+    /* Chọn nhân vật AI */
+    .persona-bar { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 12px; scrollbar-width: none; }
+    .persona-bar::-webkit-scrollbar { display: none; }
+    .persona-btn {
+      background: var(--card); border: 1px solid var(--line); padding: 9px 15px; border-radius: 99px; cursor: pointer;
+      font-size: 13px; font-weight: 800; color: var(--text-muted); white-space: nowrap; transition: .2s;
+    }
+    .persona-btn.active { background: var(--grad); color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(139, 92, 246, .35); }
+
+    /* Khung chat */
+    .chat-container { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--card); border-radius: 26px; padding: 14px; border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 4px 2px 10px; scrollbar-width: thin; }
+    .msg { max-width: 82%; padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.5; font-weight: 600; white-space: pre-wrap; word-wrap: break-word; animation: pop-in .25s ease; }
+    @keyframes pop-in { from { opacity: 0; transform: translateY(6px) scale(.98); } }
+    .msg-ai { position: relative; margin-left: 38px; background: var(--primary-light); align-self: flex-start; border-bottom-left-radius: 6px; }
+    .msg-ai::before {
+      content: "🤖"; position: absolute; left: -38px; bottom: 0; width: 30px; height: 30px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 15px; background: var(--grad);
+    }
+    .msg-user { background: var(--grad); color: #fff; align-self: flex-end; border-bottom-right-radius: 6px; box-shadow: 0 6px 14px rgba(139, 92, 246, .25); }
+    .msg-system { background: transparent; border: 1px dashed var(--line); color: var(--primary-2); align-self: center; text-align: center; font-size: 12.5px; }
+    .msg-error { background: rgba(239, 68, 68, .1); color: var(--danger); align-self: center; font-size: 13px; text-align: center; }
+    .msg a { color: var(--primary); font-weight: 800; }
+    .msg .fix { display: block; margin-top: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(245, 158, 11, .14); color: #b45309; font-size: 13px; }
+    @media (prefers-color-scheme: dark) { .msg .fix { color: #fcd34d; } }
+    /* Ba chấm "AI đang gõ" */
+    .typing { display: inline-flex; gap: 4px; align-items: center; padding: 4px 2px; font-size: 0; }
+    .typing::before, .typing::after, .typing i { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--primary-2); animation: dot 1s infinite ease-in-out; }
+    .typing i { animation-delay: .15s; }
+    .typing::after { animation-delay: .3s; }
+    @keyframes dot { 0%, 80%, 100% { transform: translateY(0); opacity: .4; } 40% { transform: translateY(-5px); opacity: 1; } }
+
+    .chat-input-area { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+    .chat-input {
+      flex: 1; min-width: 0; padding: 13px 16px; border-radius: 99px; border: 2px solid var(--line);
+      outline: none; font-size: 14px; font-weight: 600; background: var(--bg-color); transition: .25s;
+    }
+    .chat-input:focus { border-color: var(--primary-2); box-shadow: 0 0 0 4px rgba(139, 92, 246, .15); }
+    .btn-icon, .btn-send { border: none; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; flex: none; display: grid; place-items: center; font-size: 17px; transition: transform .2s; }
+    .btn-icon.mic { color: var(--danger); background: rgba(239, 68, 68, .12); }
+    .btn-icon.mic.listening { animation: pulse 1s infinite; box-shadow: 0 0 0 6px rgba(239, 68, 68, .15); }
+    @keyframes pulse { 50% { transform: scale(1.12); } }
+    .btn-send { background: var(--grad); color: #fff; box-shadow: 0 6px 14px rgba(139, 92, 246, .4); }
+    .btn-send:active { transform: scale(.9); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Trợ lý viết */
+    .writing-box { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--line); box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+    .writing-textarea {
+      width: 100%; height: 140px; border: 2px solid var(--line); border-radius: 16px; padding: 14px; background: var(--bg-color);
+      font-size: 14px; resize: none; outline: none; font-weight: 600; transition: .25s;
+    }
+    .writing-textarea:focus { border-color: var(--primary-2); box-shadow: 0 0 0 4px rgba(139, 92, 246, .15); }
+    .btn-analyze {
+      background: var(--grad); color: #fff; width: 100%; padding: 14px; border-radius: 16px; border: none; font-weight: 800; font-size: 15px;
+      margin-top: 14px; cursor: pointer; box-shadow: var(--shadow-md); transition: transform .2s;
+    }
+    .btn-analyze:hover { transform: translateY(-2px); }
+    .ai-result-card { background: var(--secondary-light); border: 1px solid rgba(16, 185, 129, .35); padding: 18px; border-radius: 24px; animation: pop-in .3s ease; }
+    .ai-result-card[hidden] { display: none; }
+    .ai-result-card h3 { color: var(--secondary); font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ai-result-item { background: var(--card); padding: 14px; border-radius: 16px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+    .ai-result-label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .ai-result-text { font-size: 15px; font-weight: 700; }
+    .ai-result-note { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+    .strike { text-decoration: line-through; color: var(--danger); }
+    .highlight { color: var(--secondary); background: rgba(16, 185, 129, .15); padding: 2px 6px; border-radius: 6px; }
+    .notice { background: rgba(245, 158, 11, .14); color: #b45309; border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; }
+    .notice a { color: var(--primary); }
+
+    /* ================= THANH ĐIỀU HƯỚNG NỔI ================= */
+    .bottom-nav {
+      position: absolute; left: 14px; right: 14px; bottom: 14px; z-index: 10;
+      display: flex; justify-content: space-around; padding: 10px 6px 12px; border-radius: 26px;
+      background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--line); box-shadow: 0 14px 30px rgba(30, 27, 75, .16);
+    }
+    .nav-item {
+      background: none; border: none; color: var(--text-muted); font-size: 19px; cursor: pointer; transition: color .3s, transform .3s;
+      display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; padding: 4px 10px; border-radius: 16px;
+    }
+    .nav-item span { font-size: 11px; font-weight: 800; }
+    .nav-item.active { color: var(--primary); transform: translateY(-3px); }
+    .nav-item.active i { animation: pop .35s ease; }
+    @keyframes pop { 50% { transform: scale(1.3); } }
+    .nav-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .nav-indicator {
+      position: absolute; top: 4px; left: 0; width: 36px; height: 4px; border-radius: 4px; background: var(--grad);
+      box-shadow: 0 0 12px rgba(139, 92, 246, .7); transition: transform .35s cubic-bezier(.4, 1.4, .6, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .screen.from-right, .screen.from-left, .nav-item.active i, .ripple, .ai-main-card, .orb, .mascot, .msg, .typing::before, .typing::after, .typing i { animation: none; }
+      .ripple { display: none; }
+      .nav-indicator, .nav-item, .ring .bar { transition: none; }
+    }
+  </style>
+  <script src="js/demo-switcher.js" defer></script>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="app-header">
+      <a class="user-info" href="app.html#/profile" title="Hồ sơ & thành tích">
+        <div class="avatar"><i class="fa-solid fa-user-astronaut" aria-hidden="true"></i></div>
+        <div>
+          <div class="greet" id="greet">Xin chào 👋</div>
+          <div class="user-name" id="user-name">Học viên</div>
+          <div class="user-level" id="user-level">Cấp A1</div>
+        </div>
+      </a>
+      <div class="stats">
+        <div class="stat-badge streak" title="Chuỗi ngày học"><i class="fa-solid fa-fire" aria-hidden="true"></i> <span id="streak-val">0</span></div>
+        <div class="stat-badge" id="xp-badge" title="Điểm kinh nghiệm"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span id="xp-val">0</span></div>
+      </div>
+    </header>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="app-content">
+
+      <!-- MÀN HÌNH 1: TRANG CHỦ -->
+      <section id="screen-home" class="screen active" aria-label="Trang chủ">
+        <div class="ai-main-card">
+          <span class="orb o1" aria-hidden="true"></span><span class="orb o2" aria-hidden="true"></span>
+          <div class="mascot" aria-hidden="true">🤖</div>
+          <span class="pill">✨ Gia sư nhập vai · Sửa lỗi tức thì</span>
+          <h2>Gia sư AI 24/7</h2>
+          <p>Sẵn sàng luyện nói &amp; sửa lỗi cùng bạn</p>
+          <button type="button" class="btn-ai" data-tab="chat">
+            <i class="fa-solid fa-comments" aria-hidden="true"></i> Bắt đầu nói
+          </button>
+        </div>
+
+        <div class="goal-card">
+          <div class="ring" role="img" id="goal-ring" aria-label="Tiến độ mục tiêu hôm nay">
+            <svg viewBox="0 0 70 70" aria-hidden="true">
+              <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+              <circle class="track" cx="35" cy="35" r="29"/>
+              <circle class="bar" id="ring-bar" cx="35" cy="35" r="29" stroke-dasharray="182.2" stroke-dashoffset="182.2"/>
+            </svg>
+            <b id="ring-pct">0%</b>
+          </div>
+          <div class="goal-info">
+            <strong>Mục tiêu hôm nay</strong>
+            <span id="goal-text">0/50 XP</span>
+            <div class="week" id="week" aria-label="7 ngày gần nhất"></div>
+          </div>
+        </div>
+
+        <h2 class="section-title">Tính năng Trí tuệ Nhân tạo</h2>
+        <div class="feature-grid">
+          <button type="button" class="feature-card fc-roleplay" data-tab="chat" data-persona="strict">
+            <span class="feature-icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span>
+            <span class="feature-title">Nhập vai AI</span>
+            <span class="feature-desc">Phỏng vấn, du lịch...</span>
+          </button>
+          <button type="button" class="feature-card fc-write" data-tab="writing">
+            <span class="feature-icon"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i></span>
+            <span class="feature-title">Trợ lý Viết</span>
+            <span class="feature-desc">Sửa ngữ pháp, nâng cấp từ</span>
+          </button>
+          <a class="feature-card fc-pronun" href="app.html#/ailab/dict">
+            <span class="feature-icon"><i class="fa-solid fa-wave-square" aria-hidden="true"></i></span>
+            <span class="feature-title">Chấm Phát âm</span>
+            <span class="feature-desc">Sóng âm &amp; điểm từng từ</span>
+          </a>
+          <a class="feature-card fc-srs" href="app.html#/review">
+            <span class="feature-icon"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+            <span class="feature-title">AI SRS</span>
+            <span class="feature-desc" id="srs-desc">Ôn tập thông minh</span>
+          </a>
+        </div>
+
+        <h2 class="section-title">Gamification</h2>
+        <div class="feature-grid">
+          <a class="feature-card row fc-badge" href="app.html#/profile">
+            <span class="feature-icon"><i class="fa-solid fa-medal" aria-hidden="true"></i></span>
+            <span><span class="feature-title" id="badge-count">0 huy hiệu</span><br><span class="feature-desc">Bảng xếp hạng tuần</span></span>
+          </a>
+          <a class="feature-card row fc-quest" href="app.html#/home">
+            <span class="feature-icon"><i class="fa-solid fa-gift" aria-hidden="true"></i></span>
+            <span><span class="feature-title">Nhiệm vụ</span><br><span class="feature-desc" id="quest-desc">0/4 hoàn thành</span></span>
+          </a>
+        </div>
+      </section>
+
+      <!-- MÀN HÌNH 2: AI CHAT (LUYỆN NÓI) -->
+      <section id="screen-chat" class="screen" aria-label="Trò chuyện với gia sư AI">
+        <div class="persona-bar" role="group" aria-label="Chọn nhân vật AI">
+          <button type="button" class="persona-btn active" data-persona="friend">🌴 Bạn bản xứ</button>
+          <button type="button" class="persona-btn" data-persona="strict">💼 Nhà tuyển dụng</button>
+          <button type="button" class="persona-btn" data-persona="guide">✈️ Du lịch</button>
+        </div>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-box" aria-live="polite"></div>
+          <form class="chat-input-area" id="chat-form">
+            <button type="button" class="btn-icon mic" id="btn-mic" title="Nói bằng giọng" aria-label="Nói bằng giọng"><i class="fa-solid fa-microphone" aria-hidden="true"></i></button>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Nhắn tin bằng tiếng Anh..." autocomplete="off" aria-label="Tin nhắn">
+            <button type="submit" class="btn-send" id="btn-send" aria-label="Gửi"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+          </form>
+        </div>
+      </section>
+
+      <!-- MÀN HÌNH 3: TRỢ LÝ VIẾT AI -->
+      <section id="screen-writing" class="screen" aria-label="Trợ lý viết">
+        <h2 class="section-title">Trợ lý Viết thông minh <small><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI</small></h2>
+
+        <div class="writing-box">
+          <label for="writing-input" class="ai-result-label">Đoạn văn tiếng Anh của bạn</label>
+          <textarea class="writing-textarea" id="writing-input" placeholder="Ví dụ: I very like go to the park yesterday with my friend..."></textarea>
+          <button type="button" class="btn-analyze" id="btn-analyze">Phân tích &amp; Sửa lỗi <i class="fa-solid fa-bolt" aria-hidden="true"></i></button>
+        </div>
+
+        <!-- Kết quả từ AI -->
+        <div class="ai-result-card" id="writing-result" hidden aria-live="polite"></div>
+      </section>
+
+    </main>
+
+    <!-- THANH ĐIỀU HƯỚNG DƯỚI -->
+    <nav class="bottom-nav" aria-label="Điều hướng chính">
+      <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
+      <button type="button" class="nav-item active" data-tab="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Trang chủ</span></button>
+      <button type="button" class="nav-item" data-tab="chat"><i class="fa-solid fa-robot" aria-hidden="true"></i><span>AI Chat</span></button>
+      <button type="button" class="nav-item" data-tab="writing"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i><span>Viết AI</span></button>
+      <a class="nav-item" href="app.html#/profile"><i class="fa-solid fa-user" aria-hidden="true"></i><span>Cá nhân</span></a>
+    </nav>
+  </div>
+
+  <!-- LOGIC: dùng chung AI và tiến độ với ứng dụng chính (app.html) -->
+  <script type="module">
+    import { chatStream, aiTask, detectServer, server, listen, canListen, speak } from './js/ai.js';
+
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const STORE = 'engmate-v1';
+    const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+    const yesterday = () => { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+
+    // ---------- Tiến độ dùng chung với app.html ----------
+    const loadState = () => { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } };
+    let state = loadState();
+    const apiKey = () => state.settings?.apiKey || '';
+    const aiReady = () => !!apiKey() || server.ai;
+    const streak = () => (state.lastDay === today() || state.lastDay === yesterday()) ? (state.streak || 0) : 0;
+
+    function renderStats() {
+      const p = state.profile || {};
+      $('#user-name').textContent = p.name || 'Học viên';
+      $('#user-level').textContent = `Cấp ${p.level || 'A1'} ⚡`;
+      $('#streak-val').textContent = streak();
+      $('#xp-val').textContent = state.xp || 0;
+      $('#badge-count').textContent = `${(state.badges || []).length} huy hiệu`;
+      const due = Object.values(state.srs || {}).filter(c => c.due <= Date.now()).length;
+      $('#srs-desc').textContent = due ? `${due} từ cần ôn hôm nay` : 'Ôn tập thông minh';
+      const q = state.quests?.date === today() ? Object.values(state.quests.done || {}).filter(Boolean).length : 0;
+      $('#quest-desc').textContent = `${q}/4 hoàn thành`;
+
+      const h = new Date().getHours();
+      $('#greet').textContent = h < 11 ? 'Chào buổi sáng ☀️' : h < 14 ? 'Chào buổi trưa 🌤️' : h < 18 ? 'Chào buổi chiều 🌇' : 'Chào buổi tối 🌙';
+      const GOAL = 50; // trùng nhiệm vụ "Kiếm 50 XP" của app
+      const todayXP = state.xpByDay?.[today()] || 0;
+      const pct = Math.min(100, Math.round(100 * todayXP / GOAL));
+      $('#ring-bar').style.strokeDashoffset = 182.2 * (1 - pct / 100);
+      $('#ring-pct').textContent = `${pct}%`;
+      $('#goal-text').textContent = pct >= 100 ? `Đã đạt ${todayXP} XP hôm nay 🎉` : `${todayXP}/${GOAL} XP · còn ${GOAL - todayXP} XP nữa`;
+      const DAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+      $('#week').innerHTML = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(); d.setDate(d.getDate() - (6 - i));
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return `<i class="${state.xpByDay?.[key] ? 'on' : ''} ${i === 6 ? 'today' : ''}" title="${key}">${DAYS[d.getDay()]}</i>`;
+      }).join('');
+    }
+
+    // Cộng XP vào tiến độ chung (app.html đọc lại khi mở).
+    function updateXP(amount) {
+      state = loadState();
+      if (!state.profile) return; // chưa tạo hồ sơ trong app
+      state.xp = (state.xp || 0) + amount;
+      state.xpByDay = state.xpByDay || {};
+      state.xpByDay[today()] = (state.xpByDay[today()] || 0) + amount;
+      if (state.lastDay !== today()) {
+        state.streak = state.lastDay === yesterday() ? (state.streak || 0) + 1 : 1;
+        state.lastDay = today();
+      }
+      state.updatedAt = Date.now();
+      localStorage.setItem(STORE, JSON.stringify(state));
+      renderStats();
+      const badge = $('#xp-badge');
+      badge.classList.add('flash');
+      setTimeout(() => badge.classList.remove('flash'), 600);
+    }
+
+    // ---------- 1. Chuyển màn hình (có hiệu ứng, lịch sử, vuốt, bàn phím) ----------
+    const TABS = ['home', 'chat', 'writing'];
+    const main = $('.app-content');
+    const indicator = $('#nav-indicator');
+    const scrollPos = {};
+    let current = null;
+    const finePointer = matchMedia('(pointer: fine)').matches;
+
+    function moveIndicator() {
+      const btn = document.querySelector('.nav-item.active');
+      if (btn) indicator.style.transform = `translateX(${btn.offsetLeft + btn.offsetWidth / 2 - indicator.offsetWidth / 2}px)`;
+    }
+
+    // push=false khi chuyển do nút Back/Forward hoặc lúc mở trang.
+    function switchTab(tab, push = true) {
+      if (!TABS.includes(tab)) tab = 'home';
+      if (tab === current) {
+        main.scrollTo({ top: 0, behavior: 'smooth' }); // bấm lại tab đang mở → cuộn lên đầu
+        return;
+      }
+      if (current) scrollPos[current] = main.scrollTop;
+      const dir = current && TABS.indexOf(tab) < TABS.indexOf(current) ? 'from-left' : 'from-right';
+      document.querySelectorAll('.screen').forEach(sc => {
+        const on = sc.id === `screen-${tab}`;
+        sc.classList.toggle('active', on);
+        sc.classList.remove('from-left', 'from-right');
+        if (on && current) { void sc.offsetWidth; sc.classList.add(dir); } // khởi động lại animation
+      });
+      document.querySelectorAll('.nav-item[data-tab]').forEach(n => {
+        const on = n.dataset.tab === tab;
+        n.classList.toggle('active', on);
+        if (on) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');
+      });
+      const first = current === null;
+      current = tab;
+      moveIndicator();
+      main.scrollTop = scrollPos[tab] || 0;
+      if (push) history.pushState({ tab }, '', '#' + tab);
+      if (!first) navigator.vibrate?.(8);
+      if (tab === 'chat' && finePointer && !first) $('#chat-input').focus({ preventScroll: true });
+    }
+
+    document.querySelectorAll('[data-tab]').forEach(el => el.addEventListener('click', () => {
+      switchTab(el.dataset.tab);
+      if (el.dataset.persona) changePersona(el.dataset.persona);
+    }));
+    window.addEventListener('popstate', e => switchTab(e.state?.tab || location.hash.slice(1), false));
+    window.addEventListener('resize', moveIndicator);
+
+    // Phím ←/→ trên thanh điều hướng
+    $('.bottom-nav').addEventListener('keydown', e => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const next = TABS[(TABS.indexOf(current) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length];
+      switchTab(next);
+      document.querySelector(`.nav-item[data-tab="${next}"]`).focus();
+    });
+
+    // Vuốt trái/phải trên điện thoại để đổi tab (bỏ qua khi vuốt danh sách nhân vật hoặc ô nhập)
+    let touch = null;
+    main.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      touch = e.target.closest('.persona-bar, input, textarea') ? null : { x: t.clientX, y: t.clientY };
+    }, { passive: true });
+    main.addEventListener('touchend', e => {
+      if (!touch) return;
+      const t = e.changedTouches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y;
+      touch = null;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      const i = TABS.indexOf(current) + (dx < 0 ? 1 : -1);
+      if (i >= 0 && i < TABS.length) switchTab(TABS[i]);
+    }, { passive: true });
+
+    // Gợn sóng khi chạm nút
+    document.addEventListener('pointerdown', e => {
+      const el = e.target.closest('button, .feature-card, .nav-item');
+      if (!el || el.disabled) return;
+      const r = el.getBoundingClientRect(), size = Math.max(r.width, r.height);
+      const dot = document.createElement('span');
+      dot.className = 'ripple';
+      dot.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px`;
+      el.appendChild(dot);
+      dot.addEventListener('animationend', () => dot.remove());
+    });
+
+    // ---------- 2. Nhân vật AI ----------
+    const PERSONAS = {
+      friend: { name: 'Bạn bản xứ', greeting: "Hey! Let's chat like friends. How was your day?" },
+      strict: { name: 'Nhà tuyển dụng', greeting: 'Good morning. Please have a seat. Tell me about yourself.' },
+      guide: { name: 'Hướng dẫn viên du lịch', greeting: 'Welcome! I will help you with flights, hotels and sightseeing. Where are we going today?' },
+    };
+    let persona = 'friend';
+    let chatHistory = []; // hội thoại gửi cho AI (chỉ nối thêm, không sửa)
+    const chatBox = $('#chat-box');
+
+    function addMessage(kind, html) {
+      chatBox.insertAdjacentHTML('beforeend', `<div class="msg msg-${kind}">${html}</div>`);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return chatBox.lastElementChild;
+    }
+    // Phần "✏️ Sửa lỗi" của gia sư được tách thành khung riêng.
+    const formatReply = text => {
+      const [main, ...fix] = esc(text).split('✏️');
+      return fix.length ? `${main.trim()}<span class="fix">✏️${fix.join('✏️')}</span>` : main;
+    };
+
+    function changePersona(id) {
+      if (!PERSONAS[id]) return;
+      persona = id;
+      chatHistory = [];
+      document.querySelectorAll('.persona-btn').forEach(b => b.classList.toggle('active', b.dataset.persona === id));
+      addMessage('system', `<b>Đã chuyển sang: ${esc(PERSONAS[id].name)}</b><br>${esc(PERSONAS[id].greeting)}`);
+    }
+    document.querySelectorAll('.persona-btn').forEach(b => b.addEventListener('click', () => changePersona(b.dataset.persona)));
+
+    // ---------- 3. Chat với AI ----------
+    let busy = false;
+    async function sendMessage() {
+      const input = $('#chat-input');
+      const text = input.value.trim();
+      if (!text || busy) return;
+      if (!aiReady()) {
+        addMessage('error', 'Gia sư AI chưa được bật. Hãy chạy máy chủ (chay-app.bat) với ANTHROPIC_API_KEY, hoặc nhập API key trong <a href="app.html#/settings">Cài đặt</a>.');
+        return;
+      }
+      busy = true;
+      $('#btn-send').disabled = true;
+      input.value = '';
+      addMessage('user', esc(text));
+      chatHistory.push({ role: 'user', content: text });
+      const out = addMessage('ai', '<span class="typing" role="status" aria-label="AI đang trả lời"><i></i></span>');
+      let acc = '';
+      try {
+        const p = state.profile || {};
+        const msg = await chatStream({
+          apiKey: apiKey(),
+          ctx: { level: p.level || 'A1', ageGroup: p.ageGroup || 'worker', scenario: persona, name: p.name || '' },
+          history: chatHistory,
+          onText: d => { acc += d; out.innerHTML = formatReply(acc); chatBox.scrollTop = chatBox.scrollHeight; },
+        });
+        if (msg.stop_reason === 'refusal') {
+          chatHistory.pop();
+          out.innerHTML = 'Gia sư không thể trả lời tin nhắn này. Hãy thử nói khác đi nhé.';
+        } else {
+          chatHistory.push({ role: 'assistant', content: msg.content });
+          const reply = msg.content.filter(b => b.type === 'text').map(b => b.text).join('');
+          out.innerHTML = formatReply(reply);
+          speak(reply.split('✏️')[0], state.settings?.speechRate || 0.95);
+          updateXP(5);
+        }
+      } catch (e) {
+        chatHistory.pop();
+        out.className = 'msg msg-error';
+        out.textContent = '⚠️ ' + e.message;
+      }
+      busy = false;
+      $('#btn-send').disabled = false;
+      input.focus();
+    }
+    $('#chat-form').addEventListener('submit', e => { e.preventDefault(); sendMessage(); });
+
+    // Nút micro: nói tiếng Anh, chữ được điền vào ô chat.
+    const mic = $('#btn-mic');
+    mic.disabled = !canListen;
+    if (!canListen) mic.title = 'Trình duyệt này không hỗ trợ nhận dạng giọng nói (hãy dùng Chrome/Edge)';
+    mic.addEventListener('click', async () => {
+      mic.classList.add('listening');
+      try { $('#chat-input').value = await listen(); $('#chat-input').focus(); }
+      catch (e) { addMessage('error', esc(e.message)); }
+      mic.classList.remove('listening');
+    });
+
+    // ---------- 4. Trợ lý viết ----------
+    $('#btn-analyze').addEventListener('click', async () => {
+      const text = $('#writing-input').value.trim();
+      const box = $('#writing-result');
+      if (text.length < 10) {
+        box.hidden = false;
+        box.innerHTML = '<div class="ai-result-item">Vui lòng nhập một đoạn văn dài hơn để AI phân tích!</div>';
+        return;
+      }
+      if (!aiReady()) {
+        box.hidden = false;
+        box.innerHTML = '<div class="notice">Trợ lý viết cần AI. Hãy chạy máy chủ với ANTHROPIC_API_KEY hoặc nhập key trong <a href="app.html#/settings">Cài đặt</a>.</div>';
+        return;
+      }
+      const btn = $('#btn-analyze');
+      const label = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Đang phân tích... <i class="fa-solid fa-spinner fa-spin"></i>';
+      try {
+        const r = await aiTask({ apiKey: apiKey(), task: 'write', level: state.profile?.level || 'A1', input: text });
+        const item = (label, from, to, note) => `<div class="ai-result-item"><div class="ai-result-label">${label}</div>
+          <div class="ai-result-text"><span class="strike">${esc(from)}</span> → <span class="highlight">${esc(to)}</span></div>
+          <div class="ai-result-note">${esc(note)}</div></div>`;
+        box.innerHTML = `<h3><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Phân tích từ AI · ${Math.max(0, Math.min(10, r.score))}/10</h3>
+          <div class="ai-result-item"><div class="ai-result-note" style="margin:0">${esc(r.summary_vi)}</div></div>
+          ${r.corrections.map(c => item('Lỗi ngữ pháp (Grammar)', c.original, c.corrected, c.explanation_vi)).join('')}
+          ${r.upgrades.map(u => item('Nâng cấp từ vựng (Vocabulary)', u.original, u.better, u.note_vi)).join('')}
+          <div class="ai-result-item"><div class="ai-result-label">Bản viết hay hơn</div><div class="ai-result-text">${esc(r.improved_version)}</div></div>`;
+        updateXP(20);
+      } catch (e) {
+        box.innerHTML = `<div class="notice">⚠️ ${esc(e.message)}</div>`;
+      }
+      box.hidden = false;
+      btn.disabled = false;
+      btn.innerHTML = label;
+    });
+
+    // ---------- Khởi động ----------
+    const startTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+    history.replaceState({ tab: startTab }, '', '#' + startTab);
+    switchTab(startTab, false);
+    document.fonts?.ready.then(moveIndicator);
+    addMessage('ai', esc("Hey there! I'm your AI tutor. What would you like to talk about today? (Hãy thử gõ tiếng Anh nhé!)"));
+    renderStats();
+    window.addEventListener('storage', () => { state = loadState(); renderStats(); });
+    detectServer().then(() => {
+      if (!aiReady()) addMessage('system', 'Chưa bật AI: chạy <b>chay-app.bat</b> với ANTHROPIC_API_KEY hoặc nhập key trong <a href="app.html#/settings">Cài đặt</a>.');
+    });
+    if (!state.profile?.onboarded) addMessage('system', 'Bạn chưa có hồ sơ học. <a href="app.html">Làm bài kiểm tra đầu vào</a> để lưu XP và lộ trình.');
+  </script>
+</body>
+</html>

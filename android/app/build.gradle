@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.engmate.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.engmate.app'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+        // Địa chỉ máy chủ Python. 10.0.2.2 = máy tính của bạn khi chạy trên máy ảo Android.
+        // Dùng điện thoại thật: đổi thành IP LAN của máy tính, ví dụ "http://192.168.1.10:5000/".
+        buildConfigField 'String', 'SERVER_URL', '"http://10.0.2.2:5000/"'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+}

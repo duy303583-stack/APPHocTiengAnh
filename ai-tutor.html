@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6366f1">
+  <title>EngMate - Học Tiếng Anh</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <!-- Phông chữ & biểu tượng -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ================= CSS TOÀN CỤC ================= */
+    :root {
+      --bg-body: #cbd5e1;       /* Màu nền viền ngoài */
+      --bg-app: #f0f4f8;        /* Màu nền app */
+      --white: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --line: #e2e8f0;
+      --primary: #6366f1;       /* Màu chủ đạo (tím xanh) */
+      --primary-light: #eef2ff;
+      --accent: #f59e0b;        /* Màu cam (XP) */
+      --ok: #16a34a;
+      --danger: #ef4444;
+      --shadow-sm: 0 4px 15px rgba(0, 0, 0, .04);
+      --shadow-md: 0 8px 25px rgba(99, 102, 241, .2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Nunito', system-ui, sans-serif; color: var(--text-main);
+      background-color: var(--bg-body); display: flex; justify-content: center; align-items: center; min-height: 100vh;
+    }
+    button, input, textarea { font: inherit; color: inherit; }
+    a { color: inherit; }
+
+    /* Khung giả lập điện thoại */
+    .app-container {
+      width: 100%; max-width: 414px; height: 896px; max-height: 100vh; background-color: var(--bg-app);
+      position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
+    }
+
+    /* ================= HEADER ================= */
+    .app-header {
+      padding: 20px; background: var(--white); display: flex; align-items: center; gap: 15px;
+      border-radius: 0 0 24px 24px; box-shadow: var(--shadow-sm); z-index: 10;
+    }
+    .avatar { width: 50px; height: 50px; background: #ffd54f; border-radius: 50%; display: grid; place-items: center; font-size: 28px; flex: none; }
+    .user-name { font-weight: 800; font-size: 18px; }
+    .user-level { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+    /* ================= NỘI DUNG CHÍNH ================= */
+    .app-content { flex: 1; overflow-y: auto; padding: 20px 20px 110px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 15px; }
+    .section-title { font-size: 18px; font-weight: 800; }
+    .link-btn { background: none; border: none; font-size: 13px; color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: none; }
+
+    /* --- Banner chào mừng / tiến độ --- */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--primary), #818cf8); color: #fff; padding: 20px; border-radius: 20px;
+      box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .welcome-banner h2 { font-size: 20px; margin-bottom: 5px; font-weight: 800; }
+    .welcome-banner p { font-size: 13px; opacity: .9; margin-bottom: 15px; font-weight: 600; }
+    .progress-bar-bg { height: 8px; background: rgba(255, 255, 255, .3); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+    .progress-bar-fill { height: 100%; background: #fde047; width: 0; border-radius: 4px; transition: width .6s ease; }
+    .banner-foot { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; }
+
+    /* --- Chủ đề học tập (cuộn ngang) --- */
+    .topics-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+    .topics-container::-webkit-scrollbar { display: none; }
+    .topic-card {
+      min-width: 110px; background: var(--white); padding: 15px; border: none; border-radius: 20px; text-align: center;
+      box-shadow: var(--shadow-sm); cursor: pointer; transition: transform .2s;
+    }
+    .topic-card:active { transform: scale(.95); }
+    .topic-icon { width: 50px; height: 50px; border-radius: 16px; margin: 0 auto 10px; display: grid; place-items: center; font-size: 24px; }
+    .topic-title { display: block; font-size: 14px; font-weight: 800; }
+    .topic-desc { display: block; font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+    .bg-travel { background: #e0f2fe; color: #0284c7; }
+    .bg-work { background: #fce7f3; color: #db2777; }
+    .bg-daily { background: #fef3c7; color: #d97706; }
+    .bg-school { background: #dcfce7; color: #16a34a; }
+
+    /* --- Tính năng nổi bật --- */
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .feature-card {
+      background: var(--white); padding: 18px; border: none; border-radius: 20px; box-shadow: var(--shadow-sm); text-align: left; text-decoration: none;
+      display: flex; flex-direction: column; gap: 10px; cursor: pointer; transition: transform .2s;
+    }
+    .feature-card:active { transform: scale(.96); }
+    .feature-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; }
+    .feature-title { font-weight: 800; font-size: 15px; }
+    .feature-desc { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .fc-ai .feature-icon { background: #f3e5f5; color: #9c27b0; }
+    .fc-pronun .feature-icon { background: #e3f2fd; color: #1e88e5; }
+    .fc-grammar .feature-icon { background: #ffebee; color: #f44336; }
+    .fc-srs .feature-icon { background: #e8f5e9; color: #4caf50; }
+
+    /* ================= MÀN HÌNH & HIỆU ỨNG ================= */
+    .screen { display: none; flex-direction: column; height: 100%; }
+    .screen.active { display: flex; }
+    .screen > * { flex-shrink: 0; }
+    .screen.from-right { animation: inRight .28s ease; }
+    .screen.from-left { animation: inLeft .28s ease; }
+    @keyframes inRight { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
+    @keyframes inLeft { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
+    button, .feature-card, .topic-card, .nav-item { position: relative; overflow: hidden; }
+    .ripple { position: absolute; border-radius: 50%; pointer-events: none; background: currentColor; opacity: .2; transform: scale(0); animation: ripple .5s ease-out forwards; }
+    @keyframes ripple { to { transform: scale(2.4); opacity: 0; } }
+    .screen-title { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+    .card { background: var(--white); border-radius: 20px; padding: 16px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
+    .muted { color: var(--text-muted); font-size: 13px; font-weight: 600; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      background: var(--white); border: 1px solid var(--line); padding: 8px 14px; border-radius: 20px; white-space: nowrap; cursor: pointer;
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+    }
+    .chip.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+    /* --- Lộ trình --- */
+    .level-head { display: flex; align-items: center; gap: 8px; margin: 18px 0 8px; font-weight: 800; }
+    .level-pill { color: #fff; font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 99px; }
+    .lesson { display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 12px 14px; margin-bottom: 8px; }
+    .lesson .ico { width: 44px; height: 44px; border-radius: 14px; background: var(--primary-light); display: grid; place-items: center; font-size: 22px; flex: none; }
+    .lesson .grow { flex: 1; min-width: 0; }
+    .lesson b { display: block; font-size: 14px; }
+    .lesson.locked { opacity: .45; pointer-events: none; }
+
+    /* --- Gia sư AI --- */
+    .segment { display: flex; background: var(--white); padding: 4px; border-radius: 16px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
+    .segment button { flex: 1; border: none; background: none; padding: 9px; border-radius: 12px; font-weight: 800; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+    .segment button.active { background: var(--primary); color: #fff; }
+    .panel { display: none; flex-direction: column; flex: 1; min-height: 0; }
+    .panel.active { display: flex; }
+    .panel > * { flex-shrink: 0; }
+    .chat-container { flex: 1 1 auto; min-height: 260px; display: flex; flex-direction: column; background: var(--white); border-radius: 24px; padding: 15px; box-shadow: var(--shadow-sm); }
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-bottom: 10px; }
+    .msg { max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.5; font-weight: 600; white-space: pre-wrap; word-wrap: break-word; }
+    .msg-ai { background: var(--primary-light); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg-user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg-system { background: #f3e8ff; color: #7e22ce; align-self: center; text-align: center; font-size: 13px; }
+    .msg-error { background: #fee2e2; color: #b91c1c; align-self: center; font-size: 13px; }
+    .msg a { color: var(--primary); }
+    .msg .fix { display: block; margin-top: 8px; padding: 8px 10px; border-radius: 12px; background: #fff7ed; color: #9a3412; font-size: 13px; }
+    .typing { font-style: italic; color: var(--text-muted); font-size: 13px; }
+    .chat-input-area { display: flex; gap: 10px; margin-top: 12px; align-items: center; }
+    .chat-input, .writing-textarea {
+      flex: 1; min-width: 0; padding: 13px; border-radius: 18px; border: 2px solid var(--line); outline: none;
+      font-size: 14px; font-weight: 600; background: var(--bg-app); transition: .3s;
+    }
+    .chat-input:focus, .writing-textarea:focus { border-color: var(--primary); background: #fff; }
+    .round { border: none; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; flex: none; display: grid; place-items: center; font-size: 17px; }
+    .round.mic { color: var(--danger); background: #fee2e2; }
+    .round.mic.listening { animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { transform: scale(1.12); } }
+    .round.send { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(99, 102, 241, .4); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .writing-textarea { width: 100%; height: 130px; resize: none; }
+    .btn-primary {
+      width: 100%; margin-top: 12px; padding: 13px; border: none; border-radius: 14px; background: var(--primary); color: #fff;
+      font-weight: 800; font-size: 15px; cursor: pointer; text-align: center; text-decoration: none; display: block;
+    }
+    .btn-primary.ghost { background: var(--primary-light); color: var(--primary); }
+    .result-item { background: var(--white); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--shadow-sm); }
+    .result-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block; }
+    .strike { text-decoration: line-through; color: var(--danger); }
+    .highlight { color: var(--ok); background: #dcfce7; padding: 1px 6px; border-radius: 4px; }
+    .notice { background: #fef3c7; color: #92400e; border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; }
+    .notice a { color: var(--primary); }
+
+    /* --- Ôn tập --- */
+    .flashcard { min-height: 190px; display: grid; place-items: center; text-align: center; cursor: pointer; font-size: 28px; font-weight: 800; }
+    .flashcard small { display: block; font-size: 14px; font-weight: 600; color: var(--text-muted); margin-top: 6px; }
+    .grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .grades button { border: none; border-radius: 14px; padding: 10px 4px; font-weight: 800; font-size: 13px; cursor: pointer; background: var(--primary-light); color: var(--primary); }
+    .grades button[data-q="1"] { background: #fee2e2; color: #b91c1c; }
+    .tag { display: inline-block; margin: 3px; padding: 3px 10px; border-radius: 99px; background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 800; }
+
+    /* --- Thành tích --- */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .stat { text-align: center; padding: 12px 4px; }
+    .stat b { display: block; font-size: 18px; }
+    .stat span { font-size: 11px; color: var(--text-muted); font-weight: 700; }
+    .chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+    .bar { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; font-size: 11px; color: var(--text-muted); font-weight: 700; }
+    .bar i { width: 100%; max-width: 30px; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, #818cf8, var(--primary)); min-height: 3px; }
+    .badges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .badge { text-align: center; font-size: 11px; font-weight: 700; padding: 10px 4px; }
+    .badge span { display: block; font-size: 26px; }
+    .badge.off { opacity: .35; filter: grayscale(1); }
+
+    /* ================= THANH ĐIỀU HƯỚNG DƯỚI ================= */
+    .bottom-nav {
+      position: absolute; bottom: 0; width: 100%; background: var(--white); z-index: 10;
+      display: flex; justify-content: space-between; padding: 15px 20px 25px;
+      border-radius: 24px 24px 0 0; box-shadow: 0 -5px 20px rgba(0, 0, 0, .05);
+    }
+    .nav-item {
+      background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; transition: .3s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px; width: 20%;
+    }
+    .nav-item span { font-size: 10px; font-weight: 700; }
+    .nav-item.active { color: var(--primary); transform: translateY(-3px); }
+    .nav-item.active i { animation: pop .35s ease; }
+    @keyframes pop { 50% { transform: scale(1.3); } }
+    .nav-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 10px; }
+    .nav-indicator { position: absolute; top: 6px; left: 0; width: 32px; height: 4px; border-radius: 4px; background: var(--primary); transition: transform .35s cubic-bezier(.4, 1.4, .6, 1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .screen.from-right, .screen.from-left, .nav-item.active i, .ripple { animation: none; }
+      .ripple { display: none; }
+      .nav-indicator, .nav-item, .progress-bar-fill { transition: none; }
+    }
+  </style>
+  <script src="js/demo-switcher.js" defer></script>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="avatar" id="avatar" aria-hidden="true">🤓</div>
+      <div>
+        <div class="user-name" id="user-name">EngMate</div>
+        <div class="user-level" id="user-level">Lộ trình A1 - C2</div>
+      </div>
+    </header>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="app-content">
+
+      <!-- MÀN HÌNH 1: TRANG CHỦ -->
+      <section id="screen-home" class="screen active" aria-label="Trang chủ">
+        <div class="welcome-banner">
+          <h2 id="greet">Chào buổi sáng! 🌞</h2>
+          <p id="goal-line">Mục tiêu hôm nay: kiếm 50 XP</p>
+          <div class="progress-bar-bg" role="progressbar" aria-label="Tiến độ hôm nay" aria-valuemin="0" aria-valuemax="100" id="today-bar">
+            <div class="progress-bar-fill" id="today-fill"></div>
+          </div>
+          <div class="banner-foot"><span id="today-text">0/50 XP hôm nay</span><span id="week-text">Đã đạt 0% mục tiêu tuần</span></div>
+        </div>
+
+        <div class="section-header">
+          <h2 class="section-title">Chủ đề học tập</h2>
+          <button type="button" class="link-btn" data-tab="path">Xem tất cả</button>
+        </div>
+        <div class="topics-container" id="topics"></div>
+
+        <div class="section-header">
+          <h2 class="section-title">Tính năng AI &amp; Ôn tập</h2>
+        </div>
+        <div class="feature-grid">
+          <button type="button" class="feature-card fc-ai" data-tab="ai" data-mode="chat">
+            <span class="feature-icon"><i class="fa-solid fa-robot" aria-hidden="true"></i></span>
+            <span class="feature-title">Gia sư AI</span>
+            <span class="feature-desc">Luyện nói 1-1</span>
+          </button>
+          <button type="button" class="feature-card fc-srs" data-tab="review">
+            <span class="feature-icon"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+            <span class="feature-title">Ôn tập SRS</span>
+            <span class="feature-desc" id="srs-desc">Ghi nhớ từ vựng</span>
+          </button>
+          <a class="feature-card fc-pronun" href="app.html#/ailab/dict">
+            <span class="feature-icon"><i class="fa-solid fa-microphone-lines" aria-hidden="true"></i></span>
+            <span class="feature-title">Phát âm</span>
+            <span class="feature-desc">Chấm điểm giọng</span>
+          </a>
+          <button type="button" class="feature-card fc-grammar" data-tab="ai" data-mode="writing">
+            <span class="feature-icon"><i class="fa-solid fa-spell-check" aria-hidden="true"></i></span>
+            <span class="feature-title">Ngữ pháp</span>
+            <span class="feature-desc">Sửa lỗi thông minh</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- MÀN HÌNH 2: LỘ TRÌNH -->
+      <section id="screen-path" class="screen" aria-label="Lộ trình">
+        <h2 class="screen-title">Lộ trình của bạn</h2>
+        <div class="chips" id="topic-filter" role="group" aria-label="Lọc theo chủ đề"></div>
+        <div id="path-list"></div>
+      </section>
+
+      <!-- MÀN HÌNH 3: GIA SƯ AI -->
+      <section id="screen-ai" class="screen" aria-label="Gia sư AI">
+        <div class="segment" role="tablist" aria-label="Chế độ gia sư">
+          <button type="button" class="active" data-mode="chat" role="tab">💬 Trò chuyện</button>
+          <button type="button" data-mode="writing" role="tab">✍️ Sửa bài viết</button>
+        </div>
+
+        <div class="panel active" id="panel-chat">
+          <div class="chips" role="group" aria-label="Chọn nhân vật AI">
+            <button type="button" class="chip persona-btn active" data-persona="friend">🌴 Bạn bản xứ</button>
+            <button type="button" class="chip persona-btn" data-persona="strict">💼 Nhà tuyển dụng</button>
+            <button type="button" class="chip persona-btn" data-persona="guide">✈️ Du lịch</button>
+          </div>
+          <div class="chat-container">
+            <div class="chat-messages" id="chat-box" aria-live="polite"></div>
+            <form class="chat-input-area" id="chat-form">
+              <button type="button" class="round mic" id="btn-mic" aria-label="Nói bằng giọng"><i class="fa-solid fa-microphone" aria-hidden="true"></i></button>
+              <input type="text" class="chat-input" id="chat-input" placeholder="Nhắn tin bằng tiếng Anh..." autocomplete="off" aria-label="Tin nhắn">
+              <button type="submit" class="round send" id="btn-send" aria-label="Gửi"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel" id="panel-writing">
+          <div class="card">
+            <label for="writing-input" class="result-label">Đoạn văn tiếng Anh của bạn</label>
+            <textarea class="writing-textarea" id="writing-input" placeholder="Ví dụ: I very like go to the park yesterday with my friend..."></textarea>
+            <button type="button" class="btn-primary" id="btn-analyze">Phân tích &amp; Sửa lỗi <i class="fa-solid fa-bolt" aria-hidden="true"></i></button>
+          </div>
+          <div id="writing-result" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <!-- MÀN HÌNH 4: ÔN TẬP -->
+      <section id="screen-review" class="screen" aria-label="Ôn tập">
+        <h2 class="screen-title">Ôn tập ngắt quãng</h2>
+        <div id="review-body"></div>
+      </section>
+
+      <!-- MÀN HÌNH 5: THÀNH TÍCH -->
+      <section id="screen-achievement" class="screen" aria-label="Thành tích">
+        <h2 class="screen-title">Thành tích</h2>
+        <div id="achievement-body"></div>
+      </section>
+
+    </main>
+
+    <!-- THANH ĐIỀU HƯỚNG DƯỚI -->
+    <nav class="bottom-nav" aria-label="Điều hướng chính">
+      <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
+      <button type="button" class="nav-item active" data-tab="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Trang chủ</span></button>
+      <button type="button" class="nav-item" data-tab="path"><i class="fa-solid fa-book-open" aria-hidden="true"></i><span>Lộ trình</span></button>
+      <button type="button" class="nav-item" data-tab="ai"><i class="fa-solid fa-robot" aria-hidden="true"></i><span>Gia sư AI</span></button>
+      <button type="button" class="nav-item" data-tab="review"><i class="fa-solid fa-comment-dots" aria-hidden="true"></i><span>Ôn tập</span></button>
+      <button type="button" class="nav-item" data-tab="achievement"><i class="fa-solid fa-trophy" aria-hidden="true"></i><span>Thành tích</span></button>
+    </nav>
+  </div>
+
+  <!-- LOGIC: dùng chung dữ liệu, AI và tiến độ với ứng dụng chính (app.html) -->
+  <script type="module">
+    import { LESSONS, LEVELS, LEVEL_INFO, BADGES, AGE_GROUPS, TOPICS } from './js/data.js';
+    import { chatStream, aiTask, detectServer, server, listen, canListen, speak } from './js/ai.js';
+
+    const $ = s => document.querySelector(s);
+    const $$ = s => [...document.querySelectorAll(s)];
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+    const today = () => dayKey(new Date());
+    const DAILY_GOAL = 50; // trùng nhiệm vụ "Kiếm 50 XP" của app
+
+    // ---------- Tiến độ dùng chung với app.html ----------
+    const STORE = 'engmate-v1';
+    const loadState = () => { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch { return {}; } };
+    let state = loadState();
+    const saveState = () => { state.updatedAt = Date.now(); localStorage.setItem(STORE, JSON.stringify(state)); };
+    const apiKey = () => state.settings?.apiKey || '';
+    const aiReady = () => !!apiKey() || server.ai;
+    const streak = () => (state.lastDay === today() || state.lastDay === dayKey(daysAgo(1))) ? (state.streak || 0) : 0;
+    const myLevel = () => state.profile?.level || 'A1';
+
+    function gainXP(amount) {
+      state = loadState();
+      if (!state.profile) return; // chưa có hồ sơ: làm kiểm tra đầu vào trong app trước
+      state.xp = (state.xp || 0) + amount;
+      state.xpByDay = state.xpByDay || {};
+      state.xpByDay[today()] = (state.xpByDay[today()] || 0) + amount;
+      if (state.lastDay !== today()) {
+        state.streak = state.lastDay === dayKey(daysAgo(1)) ? (state.streak || 0) + 1 : 1;
+        state.lastDay = today();
+      }
+      saveState();
+      renderHeader();
+    }
+
+    let topicFilter = 'all';
+
+    // ---------- Header & Trang chủ ----------
+    function renderHeader() {
+      const p = state.profile || {};
+      $('#avatar').textContent = AGE_GROUPS.find(g => g.id === p.ageGroup)?.icon || '🤓';
+      $('#user-name').textContent = p.name || 'EngMate';
+      $('#user-level').textContent = p.onboarded ? `Cấp ${myLevel()} · 🔥 ${streak()} ngày · ⭐ ${state.xp || 0} XP` : 'Lộ trình A1 - C2';
+    }
+
+    function renderHome() {
+      const h = new Date().getHours();
+      $('#greet').textContent = h < 11 ? 'Chào buổi sáng! 🌞' : h < 14 ? 'Chào buổi trưa! 🌤️' : h < 18 ? 'Chào buổi chiều! 🌇' : 'Chào buổi tối! 🌙';
+      const todayXP = state.xpByDay?.[today()] || 0;
+      const pct = Math.min(100, Math.round(100 * todayXP / DAILY_GOAL));
+      const weekXP = Array.from({ length: 7 }, (_, i) => state.xpByDay?.[dayKey(daysAgo(i))] || 0).reduce((a, b) => a + b, 0);
+      const weekPct = Math.min(100, Math.round(100 * weekXP / (DAILY_GOAL * 7)));
+      $('#goal-line').textContent = pct >= 100 ? 'Tuyệt vời! Bạn đã đạt mục tiêu hôm nay 🎉' : `Mục tiêu hôm nay: kiếm ${DAILY_GOAL} XP (còn ${DAILY_GOAL - todayXP} XP)`;
+      $('#today-fill').style.width = `${pct}%`;
+      $('#today-bar').setAttribute('aria-valuenow', pct);
+      $('#today-text').textContent = `${todayXP}/${DAILY_GOAL} XP hôm nay`;
+      $('#week-text').textContent = `Đã đạt ${weekPct}% mục tiêu tuần`;
+      $('#topics').innerHTML = TOPICS.map(t => `<button type="button" class="topic-card" data-topic="${t.id}">
+          <span class="topic-icon ${t.cls}" aria-hidden="true">${t.icon}</span>
+          <span class="topic-title">${t.name}</span>
+          <span class="topic-desc">${t.lessons.length} bài học</span></button>`).join('');
+      $$('#topics [data-topic]').forEach(b => b.addEventListener('click', () => { topicFilter = b.dataset.topic; switchTab('path'); }));
+      const due = Object.values(state.srs || {}).filter(c => c.due <= Date.now()).length;
+      $('#srs-desc').textContent = due ? `${due} từ cần ôn hôm nay` : 'Ghi nhớ từ vựng';
+    }
+
+    // ---------- Lộ trình ----------
+    function renderPath() {
+      $('#topic-filter').innerHTML = [{ id: 'all', icon: '📚', name: 'Tất cả' }, ...TOPICS].map(t =>
+        `<button type="button" class="chip ${t.id === topicFilter ? 'active' : ''}" data-filter="${t.id}">${t.icon} ${t.name}</button>`).join('');
+      $$('#topic-filter [data-filter]').forEach(b => b.addEventListener('click', () => { topicFilter = b.dataset.filter; renderPath(); }));
+      const topic = TOPICS.find(t => t.id === topicFilter);
+      const shown = l => !topic || topic.lessons.includes(l.id);
+      const levelIdx = l => LEVELS.indexOf(l);
+      $('#path-list').innerHTML = LEVELS.map(level => {
+        const lessons = LESSONS.filter(l => l.level === level && shown(l));
+        if (!lessons.length) return '';
+        const locked = levelIdx(level) > levelIdx(myLevel());
+        return `<div class="level-head"><span class="level-pill" style="background:${LEVEL_INFO[level].color}">${level}</span>${LEVEL_INFO[level].name}${locked ? ' 🔒' : ''}</div>
+          ${lessons.map(l => {
+            const done = state.completed?.[l.id];
+            return `<a class="card lesson ${locked ? 'locked' : ''}" href="app.html#/lesson/${l.id}" ${locked ? 'aria-disabled="true" tabindex="-1"' : ''}>
+              <span class="ico" aria-hidden="true">${l.icon}</span>
+              <span class="grow"><b>${esc(l.title)}</b><span class="muted">${l.skill}</span></span>
+              <span>${done ? '⭐'.repeat(done.stars) : locked ? '🔒' : '▶️'}</span></a>`;
+          }).join('')}`;
+      }).join('') + (state.profile?.onboarded ? '' : '<div class="notice">Bạn chưa làm kiểm tra đầu vào. <a href="app.html">Làm ngay</a> để mở đúng cấp độ của bạn.</div>');
+    }
+
+    // ---------- Ôn tập (SM-2, dùng chung bộ thẻ với app) ----------
+    let queue = [];
+    function gradeCard(card, q) {
+      if (q < 3) {
+        card.lapses = (card.lapses || 0) + 1;
+        card.reps = 0; card.interval = 0;
+        card.due = Date.now() + 10 * 60 * 1000;
+      } else {
+        card.reps += 1;
+        card.interval = card.reps === 1 ? 1 : card.reps === 2 ? 3 : Math.round(card.interval * card.ef);
+        card.due = Date.now() + card.interval * 86400000;
+      }
+      card.ef = Math.max(1.3, card.ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
+    }
+    function renderReview(reset = true) {
+      const cards = Object.values(state.srs || {});
+      if (reset) queue = cards.filter(c => c.due <= Date.now()).sort((a, b) => (b.lapses || 0) - (a.lapses || 0)).slice(0, 20);
+      const body = $('#review-body');
+      if (!cards.length) {
+        body.innerHTML = '<div class="card"><p class="muted">Chưa có thẻ từ vựng nào. Hoàn thành một bài học để thêm từ vào bộ thẻ.</p><a class="btn-primary" href="app.html#/path">Đến bài học</a></div>';
+        return;
+      }
+      const hard = cards.filter(c => c.lapses).sort((a, b) => b.lapses - a.lapses).slice(0, 8);
+      if (!queue.length) {
+        const next = Math.min(...cards.map(c => c.due));
+        body.innerHTML = `<div class="card" style="text-align:center"><div style="font-size:40px">🎉</div><b>Đã ôn hết thẻ đến hạn!</b>
+          <p class="muted">Lần ôn tiếp theo: ${new Date(next).toLocaleString('vi-VN')}</p></div>
+          ${hard.length ? `<div class="card"><b>🎯 Từ bạn hay quên</b><div>${hard.map(c => `<span class="tag">${esc(c.en)} · ${c.lapses}×</span>`).join('')}</div></div>` : ''}`;
+        return;
+      }
+      const card = queue[0];
+      body.innerHTML = `<p class="muted" style="margin-bottom:8px">${queue.length} thẻ đến hạn · tổng ${cards.length} thẻ</p>
+        <button type="button" class="card flashcard" id="flashcard" style="width:100%;border:none">${esc(card.en)}<small>Chạm để lật thẻ</small></button>
+        <div id="grades"></div>`;
+      speak(card.en, state.settings?.speechRate || 0.95);
+      $('#flashcard').addEventListener('click', () => {
+        $('#flashcard').innerHTML = `${esc(card.vi)}<small>${esc(card.en)}${card.ex ? ` · <i>${esc(card.ex)}</i>` : ''}</small>`;
+        $('#grades').innerHTML = `<p class="muted" style="text-align:center;margin:6px 0">Bạn nhớ từ này thế nào?</p><div class="grades">
+          ${[[1, '😵 Quên'], [3, '😓 Khó'], [4, '🙂 Nhớ'], [5, '😎 Dễ']].map(([q, t]) => `<button type="button" data-q="${q}">${t}</button>`).join('')}</div>`;
+        $$('#grades [data-q]').forEach(b => b.addEventListener('click', () => {
+          state = loadState();
+          const stored = state.srs[card.en];
+          if (stored) gradeCard(stored, +b.dataset.q);
+          state.reviewsDone = (state.reviewsDone || 0) + 1;
+          saveState();
+          gainXP(2);
+          queue.shift();
+          if (+b.dataset.q < 3 && stored) queue.push(stored);
+          renderReview(false);
+        }));
+      }, { once: true });
+    }
+
+    // ---------- Thành tích ----------
+    function renderAchievements() {
+      const WD = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+      const days = Array.from({ length: 7 }, (_, i) => daysAgo(6 - i));
+      const vals = days.map(d => state.xpByDay?.[dayKey(d)] || 0);
+      const max = Math.max(DAILY_GOAL, ...vals);
+      const owned = new Set(state.badges || []);
+      $('#achievement-body').innerHTML = `
+        <div class="stat-grid">
+          <div class="card stat"><b>🔥 ${streak()}</b><span>ngày liên tiếp</span></div>
+          <div class="card stat"><b>⭐ ${state.xp || 0}</b><span>tổng XP</span></div>
+          <div class="card stat"><b>📘 ${Object.keys(state.completed || {}).length}</b><span>bài học</span></div>
+          <div class="card stat"><b>🧠 ${Object.keys(state.srs || {}).length}</b><span>từ vựng</span></div>
+        </div>
+        <div class="card"><b>📈 XP 7 ngày qua</b>
+          <div class="chart" role="img" aria-label="XP 7 ngày qua: ${vals.join(', ')}" style="margin-top:10px">
+            ${days.map((d, i) => `<div class="bar">${vals[i] || ''}<i style="height:${100 * vals[i] / max}%"></i>${WD[d.getDay()]}</div>`).join('')}
+          </div></div>
+        <div class="card"><b>🎖️ Huy hiệu (${owned.size}/${BADGES.length})</b>
+          <div class="badges" style="margin-top:8px">${BADGES.map(b => `<div class="badge ${owned.has(b.id) ? '' : 'off'}" title="${esc(b.desc)}"><span>${b.icon}</span>${esc(b.name)}</div>`).join('')}</div></div>
+        <a class="btn-primary ghost" href="app.html#/profile">🏆 Bảng xếp hạng & chứng chỉ</a>`;
+    }
+
+    // ---------- Chuyển màn hình (hiệu ứng, lịch sử, vuốt, bàn phím) ----------
+    const TABS = ['home', 'path', 'ai', 'review', 'achievement'];
+    const RENDER = { home: renderHome, path: renderPath, review: renderReview, achievement: renderAchievements };
+    const main = $('.app-content');
+    const indicator = $('#nav-indicator');
+    const scrollPos = {};
+    let current = null;
+
+    function moveIndicator() {
+      const btn = document.querySelector('.nav-item.active');
+      if (btn) indicator.style.transform = `translateX(${btn.offsetLeft + btn.offsetWidth / 2 - indicator.offsetWidth / 2}px)`;
+    }
+
+    function switchTab(tab, push = true) {
+      if (!TABS.includes(tab)) tab = 'home';
+      state = loadState();
+      if (tab === current) { RENDER[tab]?.(); main.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+      RENDER[tab]?.();
+      if (current) scrollPos[current] = main.scrollTop;
+      const dir = current && TABS.indexOf(tab) < TABS.indexOf(current) ? 'from-left' : 'from-right';
+      $$('.screen').forEach(sc => {
+        const on = sc.id === `screen-${tab}`;
+        sc.classList.toggle('active', on);
+        sc.classList.remove('from-left', 'from-right');
+        if (on && current) { void sc.offsetWidth; sc.classList.add(dir); }
+      });
+      $$('.nav-item[data-tab]').forEach(n => {
+        const on = n.dataset.tab === tab;
+        n.classList.toggle('active', on);
+        if (on) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');
+      });
+      const first = current === null;
+      current = tab;
+      moveIndicator();
+      main.scrollTop = scrollPos[tab] || 0;
+      if (push) history.pushState({ tab }, '', '#' + tab);
+      if (!first) navigator.vibrate?.(8);
+    }
+
+    $$('[data-tab]').forEach(el => el.addEventListener('click', () => {
+      if (el.dataset.tab === 'path' && el.classList.contains('link-btn')) topicFilter = 'all';
+      switchTab(el.dataset.tab);
+      if (el.dataset.mode) setMode(el.dataset.mode);
+    }));
+    window.addEventListener('popstate', e => switchTab(e.state?.tab || location.hash.slice(1), false));
+    window.addEventListener('resize', moveIndicator);
+    $('.bottom-nav').addEventListener('keydown', e => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const next = TABS[(TABS.indexOf(current) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length];
+      switchTab(next);
+      document.querySelector(`.nav-item[data-tab="${next}"]`).focus();
+    });
+    let touch = null;
+    main.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      touch = e.target.closest('.chips, .topics-container, input, textarea') ? null : { x: t.clientX, y: t.clientY };
+    }, { passive: true });
+    main.addEventListener('touchend', e => {
+      if (!touch) return;
+      const t = e.changedTouches[0], dx = t.clientX - touch.x, dy = t.clientY - touch.y;
+      touch = null;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      const i = TABS.indexOf(current) + (dx < 0 ? 1 : -1);
+      if (i >= 0 && i < TABS.length) switchTab(TABS[i]);
+    }, { passive: true });
+    document.addEventListener('pointerdown', e => {
+      const el = e.target.closest('button, .feature-card, .topic-card, .nav-item');
+      if (!el || el.disabled) return;
+      const r = el.getBoundingClientRect(), size = Math.max(r.width, r.height);
+      const dot = document.createElement('span');
+      dot.className = 'ripple';
+      dot.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px`;
+      el.appendChild(dot);
+      dot.addEventListener('animationend', () => dot.remove());
+    });
+
+    // ---------- Gia sư AI: chế độ Trò chuyện / Sửa bài viết ----------
+    function setMode(mode) {
+      $$('.segment [data-mode]').forEach(b => { b.classList.toggle('active', b.dataset.mode === mode); b.setAttribute('aria-selected', b.dataset.mode === mode); });
+      $('#panel-chat').classList.toggle('active', mode === 'chat');
+      $('#panel-writing').classList.toggle('active', mode === 'writing');
+    }
+    $$('.segment [data-mode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+    const PERSONAS = {
+      friend: { name: 'Bạn bản xứ', greeting: "Hey! Let's chat like friends. How was your day?" },
+      strict: { name: 'Nhà tuyển dụng', greeting: 'Good morning. Please have a seat. Tell me about yourself.' },
+      guide: { name: 'Hướng dẫn viên du lịch', greeting: 'Welcome! I will help you with flights, hotels and sightseeing. Where are we going today?' },
+    };
+    let persona = 'friend';
+    let chatHistory = []; // hội thoại gửi cho AI (chỉ nối thêm, không sửa)
+    const chatBox = $('#chat-box');
+    const addMessage = (kind, html) => {
+      chatBox.insertAdjacentHTML('beforeend', `<div class="msg msg-${kind}">${html}</div>`);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return chatBox.lastElementChild;
+    };
+    const formatReply = text => {
+      const [body, ...fix] = esc(text).split('✏️');
+      return fix.length ? `${body.trim()}<span class="fix">✏️${fix.join('✏️')}</span>` : body;
+    };
+    function changePersona(id) {
+      if (!PERSONAS[id] || id === persona) return;
+      persona = id;
+      chatHistory = [];
+      $$('.persona-btn').forEach(b => b.classList.toggle('active', b.dataset.persona === id));
+      addMessage('system', `<b>Đã chuyển sang: ${esc(PERSONAS[id].name)}</b><br>${esc(PERSONAS[id].greeting)}`);
+    }
+    $$('.persona-btn').forEach(b => b.addEventListener('click', () => changePersona(b.dataset.persona)));
+
+    const NO_AI = 'Gia sư AI chưa được bật. Hãy chạy <b>chay-app.bat</b> với ANTHROPIC_API_KEY, hoặc nhập API key trong <a href="app.html#/settings">Cài đặt</a>.';
+    let busy = false;
+    async function sendMessage() {
+      const input = $('#chat-input');
+      const text = input.value.trim();
+      if (!text || busy) return;
+      if (!aiReady()) { addMessage('error', NO_AI); return; }
+      busy = true;
+      $('#btn-send').disabled = true;
+      input.value = '';
+      addMessage('user', esc(text));
+      chatHistory.push({ role: 'user', content: text });
+      const out = addMessage('ai', '<span class="typing">AI đang suy nghĩ <i class="fa-solid fa-ellipsis fa-fade"></i></span>');
+      let acc = '';
+      try {
+        const p = state.profile || {};
+        const msg = await chatStream({
+          apiKey: apiKey(),
+          ctx: { level: myLevel(), ageGroup: p.ageGroup || 'worker', scenario: persona, name: p.name || '' },
+          history: chatHistory,
+          onText: d => { acc += d; out.innerHTML = formatReply(acc); chatBox.scrollTop = chatBox.scrollHeight; },
+        });
+        if (msg.stop_reason === 'refusal') {
+          chatHistory.pop();
+          out.textContent = 'Gia sư không thể trả lời tin nhắn này. Hãy thử nói khác đi nhé.';
+        } else {
+          chatHistory.push({ role: 'assistant', content: msg.content });
+          const reply = msg.content.filter(b => b.type === 'text').map(b => b.text).join('');
+          out.innerHTML = formatReply(reply);
+          speak(reply.split('✏️')[0], state.settings?.speechRate || 0.95);
+          gainXP(5);
+        }
+      } catch (e) {
+        chatHistory.pop();
+        out.className = 'msg msg-error';
+        out.textContent = '⚠️ ' + e.message;
+      }
+      busy = false;
+      $('#btn-send').disabled = false;
+      input.focus();
+    }
+    $('#chat-form').addEventListener('submit', e => { e.preventDefault(); sendMessage(); });
+
+    const mic = $('#btn-mic');
+    mic.disabled = !canListen;
+    if (!canListen) mic.title = 'Trình duyệt này không hỗ trợ nhận dạng giọng nói (hãy dùng Chrome/Edge)';
+    mic.addEventListener('click', async () => {
+      mic.classList.add('listening');
+      try { $('#chat-input').value = await listen(); $('#chat-input').focus(); }
+      catch (e) { addMessage('error', esc(e.message)); }
+      mic.classList.remove('listening');
+    });
+
+    $('#btn-analyze').addEventListener('click', async () => {
+      const text = $('#writing-input').value.trim();
+      const box = $('#writing-result');
+      if (text.length < 10) { box.innerHTML = '<div class="notice">Vui lòng nhập một đoạn văn dài hơn để AI phân tích!</div>'; return; }
+      if (!aiReady()) { box.innerHTML = `<div class="notice">${NO_AI}</div>`; return; }
+      const btn = $('#btn-analyze');
+      const label = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Đang phân tích... <i class="fa-solid fa-spinner fa-spin"></i>';
+      try {
+        const r = await aiTask({ apiKey: apiKey(), task: 'write', level: myLevel(), input: text });
+        const item = (label, from, to, note) => `<div class="result-item"><span class="result-label">${label}</span>
+          <div><span class="strike">${esc(from)}</span> → <span class="highlight">${esc(to)}</span></div><div class="muted">${esc(note)}</div></div>`;
+        box.innerHTML = `<div class="result-item"><span class="result-label">Điểm ${Math.max(0, Math.min(10, r.score))}/10</span><div class="muted">${esc(r.summary_vi)}</div></div>
+          ${r.corrections.map(c => item('Lỗi ngữ pháp', c.original, c.corrected, c.explanation_vi)).join('')}
+          ${r.upgrades.map(u => item('Nâng cấp từ vựng', u.original, u.better, u.note_vi)).join('')}
+          <div class="result-item"><span class="result-label">Bản viết hay hơn</span><div>${esc(r.improved_version)}</div></div>`;
+        gainXP(20);
+      } catch (e) {
+        box.innerHTML = `<div class="notice">⚠️ ${esc(e.message)}</div>`;
+      }
+      btn.disabled = false;
+      btn.innerHTML = label;
+    });
+
+    // ---------- Khởi động ----------
+    renderHeader();
+    const startTab = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+    history.replaceState({ tab: startTab }, '', '#' + startTab);
+    switchTab(startTab, false);
+    document.fonts?.ready.then(moveIndicator);
+    addMessage('ai', esc("Hey there! I'm your AI tutor. What would you like to talk about today? (Hãy thử gõ tiếng Anh nhé!)"));
+    window.addEventListener('storage', () => { state = loadState(); renderHeader(); RENDER[current]?.(); });
+    detectServer().then(() => { if (!aiReady()) addMessage('system', NO_AI); });
+  </script>
+</body>
+</html>

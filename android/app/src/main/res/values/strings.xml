@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EngMate</string>
+    <string name="offline_title">Không kết nối được máy chủ EngMate</string>
+    <string name="offline_body">Hãy chắc chắn máy chủ Python đang chạy (python server/app.py) và điện thoại cùng mạng với máy tính.</string>
+    <string name="retry">Thử lại</string>
+</resources>
