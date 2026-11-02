@@ -397,8 +397,15 @@ function viewHome() {
       <a class="util" href="#/profile"><div class="u-ico">📈</div>Biểu đồ tiến độ</a>
       <a class="util" href="#/path"><div class="u-ico">📝</div>Kiểm tra định kỳ</a>
       <a class="util" href="#/profile"><div class="u-ico">📜</div>Chứng chỉ<div class="muted small">${state.certificates.length} đã đạt</div></a>
+    </div>
+
+    <div class="section-head"><h2>🎨 Giao diện app</h2></div>
+    <div class="utils" id="ui-picker">
+      ${UI_OPTIONS.map(o => `<a class="util" href="${o.page}" data-ui="${o.id}"><div class="u-ico">${o.icon}</div>${o.name}<div class="muted small">${currentUI() === o.id ? '✔ Đang dùng' : o.desc}</div></a>`).join('')}
+      <a class="util" href="gioi-thieu.html"><div class="u-ico">🏠</div>Giới thiệu<div class="muted small">trang trình bày</div></a>
     </div>`;
   $('#g-quests').onclick = e => { e.preventDefault(); $('#quests').scrollIntoView({ behavior: 'smooth' }); };
+  $$('#ui-picker [data-ui]').forEach(a => a.onclick = () => { try { localStorage.setItem(UI_KEY, a.dataset.ui); } catch { /* bỏ qua */ } });
   $('#u-offline').onclick = e => { e.preventDefault(); toast('Bài học, ôn tập và tiến độ đều dùng được khi mất mạng. Chỉ gia sư AI cần internet.'); };
 }
 
