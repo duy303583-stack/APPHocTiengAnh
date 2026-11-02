@@ -30,6 +30,7 @@ Không có API key thì mọi thứ vẫn chạy, chỉ các tính năng AI bị
 | `index.html` | Cổng vào duy nhất: mở giao diện đã chọn (mặc định `app.html`) |
 | `gioi-thieu.html` | Trang giới thiệu (showcase), app nằm trong khung điện thoại |
 | `app.html`, `styles.css` | Giao diện ứng dụng |
+| `demo01.html` | Demo 01: trang trình bày nền tối, app chạy thật trong khung điện thoại (xếp một cột trên điện thoại) |
 | `demo02.html` | Bản giao diện đẹp hơn của Gia sư AI: nền chuyển màu, vòng mục tiêu hôm nay, 7 ngày học, chat có avatar, chế độ tối |
 | `js/demo-switcher.js` | Nút "↩ Giao diện chuẩn" trên các giao diện phụ (đổi giao diện trong Thành tích → Cài đặt → Giao diện) |
 | `ai-tutor.html` | Giao diện gọn "Gia sư AI" (tông tím): chat nhập vai + trợ lý viết, dùng chung AI và XP với app |

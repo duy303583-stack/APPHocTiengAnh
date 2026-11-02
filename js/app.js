@@ -1373,6 +1373,7 @@ const UI_KEY = 'engmate-ui';
 const UI_OPTIONS = [
   { id: 'app', icon: '📱', name: 'Chuẩn', desc: 'đầy đủ tính năng', page: 'app.html' },
   { id: 'ai-tutor', icon: '🤖', name: 'Gia sư AI', desc: 'tông tím, 5 tab', page: 'ai-tutor.html' },
+  { id: 'demo01', icon: '🖥️', name: 'Demo 01', desc: 'khung điện thoại', page: 'demo01.html' },
   { id: 'demo02', icon: '✨', name: 'Demo 02', desc: 'chuyển màu, gọn', page: 'demo02.html' },
 ];
 const currentUI = () => { try { return localStorage.getItem(UI_KEY) || 'app'; } catch { return 'app'; } };
