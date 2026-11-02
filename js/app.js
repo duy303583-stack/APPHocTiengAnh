@@ -1,5 +1,3 @@
-import { LEVELS, LEVEL_INFO, PLACEMENT, LESSONS, BADGES, CHAT_SCENARIOS, TUTOR_AVATARS, AGE_GROUPS, TOPICS } from './data.js';
-import { speak, listen, canListen, normalize, pronunciationScore, chatStream, aiTask, server, detectServer, liveWave } from './ai.js';
 
 // ================= Helpers =================
 const $ = (s, el = document) => el.querySelector(s);

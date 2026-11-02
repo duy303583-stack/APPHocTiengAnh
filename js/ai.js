@@ -1,11 +1,11 @@
 // Giọng nói (đọc/nhận dạng) và các tính năng AI dùng Claude API.
-// Prompt dùng chung với máy chủ Python nằm trong js/prompts.json.
+// Script thường (không phải module) để chạy được cả khi mở file trực tiếp; cần nạp sau js/prompts.js.
 const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.65.0/+esm';
-export const MODEL = 'claude-opus-5-5';
+const MODEL = 'claude-opus-5-5';
 
 // ---------- Text-to-speech ----------
 // onEnd được gọi khi đọc xong (dùng cho chế độ gọi điện).
-export function speak(text, rate = 0.95, onEnd) {
+function speak(text, rate = 0.95, onEnd) {
   if (!('speechSynthesis' in window)) { onEnd?.(); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
@@ -20,9 +20,9 @@ export function speak(text, rate = 0.95, onEnd) {
 
 // ---------- Speech recognition ----------
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-export const canListen = !!Recognition;
+const canListen = !!Recognition;
 
-export function listen() {
+function listen() {
   return new Promise((resolve, reject) => {
     if (!Recognition) return reject(new Error('Trình duyệt không hỗ trợ nhận dạng giọng nói (hãy dùng Chrome hoặc Edge).'));
     const r = new Recognition();
@@ -38,7 +38,7 @@ export function listen() {
 
 // Vẽ sóng âm (độ lớn giọng theo thời gian) của micro lên canvas khi đang nói.
 // Trả về hàm dừng; hình cuối cùng vẫn giữ trên canvas.
-export async function liveWave(canvas) {
+async function liveWave(canvas) {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   const ac = new (window.AudioContext || window.webkitAudioContext)();
   const an = ac.createAnalyser();
@@ -62,10 +62,10 @@ export async function liveWave(canvas) {
   return () => { cancelAnimationFrame(raf); stream.getTracks().forEach(t => t.stop()); ac.close(); };
 }
 
-export const normalize = s => s.toLowerCase().replace(/[^a-z0-9' ]/g, ' ').replace(/\s+/g, ' ').trim();
+const normalize = s => s.toLowerCase().replace(/[^a-z0-9' ]/g, ' ').replace(/\s+/g, ' ').trim();
 
 // Chấm phát âm: tỉ lệ từ mục tiêu xuất hiện đúng thứ tự (LCS theo từ).
-export function pronunciationScore(target, said) {
+function pronunciationScore(target, said) {
   const a = normalize(target).split(' '), b = normalize(said).split(' ');
   const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
   for (let i = 1; i <= a.length; i++)
@@ -81,8 +81,7 @@ export function pronunciationScore(target, said) {
 }
 
 // ---------- Prompt dùng chung ----------
-let promptsPromise = null;
-const loadPrompts = () => (promptsPromise ||= fetch(new URL('./prompts.json', import.meta.url)).then(r => r.json()));
+const loadPrompts = async () => EM_PROMPTS; // từ js/prompts.js
 const fill = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
 
 // Giữ đồng bộ với tutor_system_prompt trong server/app.py.
@@ -97,9 +96,9 @@ function tutorSystemPrompt(P, { level, ageGroup, scenario, name, words }) {
 }
 
 // ---------- Máy chủ Python (nếu trang được mở từ server/app.py) ----------
-export const server = { online: false, ai: false };
+const server = { online: false, ai: false };
 
-export async function detectServer() {
+async function detectServer() {
   if (!location.protocol.startsWith('http')) return server;
   try {
     const res = await fetch('api/health', { cache: 'no-store' });
@@ -152,7 +151,7 @@ async function getClient(apiKey) {
 
 // Gửi hội thoại và stream câu trả lời. `history` là mảng message của API (append-only).
 // ctx = { level, ageGroup, scenario (id), name, words }. Trả về { stop_reason, content }.
-export async function chatStream({ apiKey, ctx, history, onText }) {
+async function chatStream({ apiKey, ctx, history, onText }) {
   if (server.ai && !apiKey) return serverChat({ ctx, history, onText });
   const [client, P] = await Promise.all([getClient(apiKey), loadPrompts()]);
   const base = {
@@ -180,7 +179,7 @@ export async function chatStream({ apiKey, ctx, history, onText }) {
 
 // Công cụ AI trả JSON theo schema: write | translate | story | quiz.
 // vars = { level, input, extra, words }.
-export async function aiTask({ apiKey, task, ...vars }) {
+async function aiTask({ apiKey, task, ...vars }) {
   if (server.ai && !apiKey) {
     const res = await fetch('api/assist', {
       method: 'POST',

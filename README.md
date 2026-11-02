@@ -21,7 +21,7 @@ Mở **http://localhost:5000**:
 
 Không có API key thì mọi thứ vẫn chạy, chỉ các tính năng AI bị tắt. Người dùng cũng có thể tự nhập key của mình trong **Thành tích → Cài đặt**.
 
-> Mở trực tiếp `index.html`/`app.html` bằng cách nhấp đúp (đường dẫn `file://`) sẽ **không chạy app**, vì trình duyệt chặn JavaScript module ở `file://`. Hãy chạy qua máy chủ Python như trên.
+> Có thể nhấp đúp mở thẳng `index.html` / `app.html` (đường dẫn `file://`): bài học, ôn tập, tiến độ đều chạy. Khi đó gia sư AI chỉ dùng được nếu bạn nhập API key trong Cài đặt; muốn dùng key trên máy chủ và đồng bộ tiến độ thì chạy `chay-app.bat`.
 
 ## Cấu trúc
 
@@ -35,7 +35,7 @@ Không có API key thì mọi thứ vẫn chạy, chỉ các tính năng AI bị
 | `js/app.js` | Toàn bộ màn hình và logic: lộ trình, bài học 5 bước, SRS, gamification… |
 | `js/data.js` | Nội dung: bài kiểm tra đầu vào, 12 bài học A1–C2, huy hiệu, nhân vật AI |
 | `js/ai.js` | Giọng nói (đọc/nghe), chấm phát âm, gọi Claude |
-| `js/prompts.json` | Prompt AI dùng chung cho cả JavaScript và Python |
+| `js/prompts.js` | Prompt AI dùng chung cho cả JavaScript và Python |
 | `sw.js`, `manifest.json` | Học offline, cài như app (PWA) |
 | `server/app.py` | Máy chủ Flask: phục vụ web, API AI, lưu tiến độ vào SQLite (`server/engmate.db`) |
 | `android/` | App Android (Java, WebView). Mở thư mục này bằng Android Studio |

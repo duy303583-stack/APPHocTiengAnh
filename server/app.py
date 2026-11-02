@@ -29,7 +29,8 @@ client = anthropic.Anthropic() if os.environ.get("ANTHROPIC_API_KEY") else None
 
 LEVELS = {"A1", "A2", "B1", "B2", "C1", "C2"}
 # Prompt dùng chung với js/ai.js.
-PROMPTS = json.loads((ROOT / "js" / "prompts.json").read_text(encoding="utf-8"))
+_prompts_js = (ROOT / "js" / "prompts.js").read_text(encoding="utf-8")
+PROMPTS = json.loads(_prompts_js[_prompts_js.index("{"):_prompts_js.rindex("}") + 1])
 
 
 def fill(template, values):

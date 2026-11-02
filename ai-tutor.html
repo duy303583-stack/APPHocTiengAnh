@@ -344,9 +344,10 @@
   </div>
 
   <!-- LOGIC: dùng chung dữ liệu, AI và tiến độ với ứng dụng chính (app.html) -->
+  <script src="js/data.js"></script>
+  <script src="js/prompts.js"></script>
+  <script src="js/ai.js"></script>
   <script type="module">
-    import { LESSONS, LEVELS, LEVEL_INFO, BADGES, AGE_GROUPS, TOPICS } from './js/data.js';
-    import { chatStream, aiTask, detectServer, server, listen, canListen, speak } from './js/ai.js';
 
     const $ = s => document.querySelector(s);
     const $$ = s => [...document.querySelectorAll(s)];

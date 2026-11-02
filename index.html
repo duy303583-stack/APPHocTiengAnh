@@ -187,16 +187,6 @@
     tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); navigate('#/' + t.dataset.tab); });
     document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => navigate(b.dataset.go));
 
-    if (location.protocol === 'file:') {
-      // Trình duyệt không chạy JavaScript module của app khi mở trực tiếp file trên ổ đĩa.
-      frame.parentElement.innerHTML = `<div class="file-note">
-        <div style="font-size:40px">🦉</div>
-        <b style="font-size:16px;color:#fff">Cần chạy qua máy chủ để dùng app</b>
-        <span>Bạn đang mở file trực tiếp (file://), trình duyệt sẽ chặn app. Hãy nhấp đúp file <b>chay-app.bat</b> trong thư mục dự án, hoặc chạy:</span>
-        <code>python server\\app.py</code>
-        <span>rồi mở <b>http://localhost:5000</b></span>
-      </div>`;
-    } else {
       // Đồng bộ tab bên trái khi người dùng bấm trong điện thoại.
       frame.addEventListener('load', () => {
         try {
@@ -206,9 +196,8 @@
           };
           frame.contentWindow.addEventListener('hashchange', sync);
           sync();
-        } catch { /* khung bị chặn truy cập: các tab bên trái vẫn hoạt động */ }
+        } catch { /* mở bằng file:// thì khung bị chặn truy cập: các tab bên trái vẫn hoạt động */ }
       });
-    }
 
     const tick = () => { const d = new Date(); document.getElementById('clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
     tick(); setInterval(tick, 30000);

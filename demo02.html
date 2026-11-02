@@ -396,8 +396,10 @@
   </div>
 
   <!-- LOGIC: dùng chung AI và tiến độ với ứng dụng chính (app.html) -->
+  <script src="js/data.js"></script>
+  <script src="js/prompts.js"></script>
+  <script src="js/ai.js"></script>
   <script type="module">
-    import { chatStream, aiTask, detectServer, server, listen, canListen, speak } from './js/ai.js';
 
     const $ = s => document.querySelector(s);
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

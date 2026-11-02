@@ -1,15 +1,15 @@
 // Nội dung học: bài kiểm tra đầu vào, lộ trình A1–C2, huy hiệu.
-export const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
 // 4 lứa tuổi: đổi nhãn bài học, tốc độ đọc mặc định và giọng điệu của gia sư AI.
-export const AGE_GROUPS = [
+const AGE_GROUPS = [
   { id: 'kid', icon: '🧒', name: 'Trẻ em', rate: 0.8 },
   { id: 'student', icon: '🎒', name: 'Học sinh – Sinh viên', rate: 0.95 },
   { id: 'worker', icon: '💼', name: 'Người đi làm', rate: 1 },
   { id: 'senior', icon: '👵', name: 'Người lớn tuổi', rate: 0.75 },
 ];
 
-export const LEVEL_INFO = {
+const LEVEL_INFO = {
   A1: { name: 'Mới bắt đầu', color: '#22c55e' },
   A2: { name: 'Sơ cấp', color: '#14b8a6' },
   B1: { name: 'Trung cấp', color: '#3b82f6' },
@@ -19,7 +19,7 @@ export const LEVEL_INFO = {
 };
 
 // Câu hỏi xếp lớp: sắp theo độ khó tăng dần, 2 câu mỗi cấp độ.
-export const PLACEMENT = [
+const PLACEMENT = [
   { level: 'A1', q: 'Hello! My name ___ Lan.', options: ['am', 'is', 'are', 'be'], answer: 1 },
   { level: 'A1', q: 'Chọn nghĩa đúng của "apple".', options: ['quả chuối', 'quả táo', 'quả cam', 'quả nho'], answer: 1 },
   { level: 'A2', q: 'Yesterday I ___ to the cinema with my friends.', options: ['go', 'goes', 'went', 'going'], answer: 2 },
@@ -35,7 +35,7 @@ export const PLACEMENT = [
 ];
 
 // Mỗi bài theo 5 bước: warmup → intro (vocab + grammar) → practice → apply → review.
-export const LESSONS = [
+const LESSONS = [
   // ---------- A1 ----------
   {
     id: 'a1-1', level: 'A1', title: 'Chào hỏi & giới thiệu bản thân', skill: 'Giao tiếp', icon: '👋',
@@ -340,14 +340,14 @@ const LESSON_AGES = {
 for (const l of LESSONS) l.ages = LESSON_AGES[l.id] || ALL_AGES;
 
 // Chủ đề học tập: nhóm các bài học có thật (dùng ở Trang chủ và Lộ trình).
-export const TOPICS = [
+const TOPICS = [
   { id: 'travel', icon: '✈️', name: 'Du lịch', cls: 'bg-travel', lessons: ['b1-2'] },
   { id: 'work', icon: '💼', name: 'Công việc', cls: 'bg-work', lessons: ['b2-2', 'c1-2'] },
   { id: 'daily', icon: '☕', name: 'Đời sống', cls: 'bg-daily', lessons: ['a1-1', 'a1-2', 'a1-3', 'a2-1', 'a2-2', 'a2-3'] },
   { id: 'school', icon: '🎓', name: 'Học thuật', cls: 'bg-school', lessons: ['b1-1', 'b2-1', 'c1-1', 'c2-1', 'c2-2'] },
 ];
 
-export const BADGES = [
+const BADGES = [
   { id: 'first-lesson', icon: '🎯', name: 'Bước đầu tiên', desc: 'Hoàn thành bài học đầu tiên' },
   { id: 'perfect', icon: '💯', name: 'Hoàn hảo', desc: 'Hoàn thành một bài không sai câu nào' },
   { id: 'streak-3', icon: '🔥', name: 'Lửa nhỏ', desc: 'Chuỗi 3 ngày học liên tiếp' },
@@ -365,8 +365,8 @@ export const BADGES = [
   { id: 'pronouncer', icon: '🎯', name: 'Phát âm chuẩn', desc: 'Đạt ≥80% khi luyện phát âm 10 từ trong Từ điển' },
 ];
 
-// Nhân vật / tình huống của gia sư AI. Nội dung vai diễn nằm trong js/prompts.json (scenarios).
-export const CHAT_SCENARIOS = [
+// Nhân vật / tình huống của gia sư AI. Nội dung vai diễn nằm trong js/prompts.js (scenarios).
+const CHAT_SCENARIOS = [
   { id: 'free', icon: '💬', name: 'Trò chuyện tự do' },
   { id: 'friend', icon: '😎', name: 'Jake – bạn bản xứ' },
   { id: 'strict', icon: '👩‍💼', name: 'Ms. Carter – HR khó tính' },
@@ -377,4 +377,4 @@ export const CHAT_SCENARIOS = [
 ];
 
 // Avatar gia sư mở khóa dần khi thắng Đấu trường AI.
-export const TUTOR_AVATARS = ['🦉', '🤖', '🐱', '🦊', '🐼', '🦄', '🐉', '👽'];
+const TUTOR_AVATARS = ['🦉', '🤖', '🐱', '🦊', '🐼', '🦄', '🐉', '👽'];

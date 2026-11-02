@@ -27,8 +27,9 @@
 
   const css = document.createElement('style');
   css.textContent = `
-    .dsw-btn { position: fixed; right: 12px; top: 50%; transform: translateY(-50%); z-index: 9999; width: 44px; height: 44px;
-      border: none; border-radius: 50%; cursor: pointer; font-size: 20px; color: #fff;
+    .dsw-btn { position: fixed; right: 12px; top: 50%; transform: translateY(-50%); z-index: 9999; height: 44px; padding: 0 14px 0 10px;
+      display: flex; align-items: center; gap: 6px; border: none; border-radius: 99px; cursor: pointer; color: #fff;
+      font: 800 13px 'Nunito', system-ui, sans-serif;
       background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 8px 20px rgba(99, 102, 241, .45); transition: transform .2s; }
     .dsw-btn:hover { transform: translateY(-50%) scale(1.08); }
     .dsw-btn:focus-visible { outline: 3px solid #fde047; outline-offset: 2px; }
@@ -48,13 +49,13 @@
       .dsw-menu a:hover, .dsw-menu a:focus-visible { background: #2e2a5c; }
     }
     @media (max-width: 520px) { .dsw-btn { top: auto; bottom: 96px; transform: none; } .dsw-btn:hover { transform: scale(1.08); }
-      .dsw-menu { top: auto; bottom: 150px; right: 12px; transform: none; } }`;
+      .dsw-menu { top: auto; bottom: 150px; right: 12px; transform: none; } .dsw-btn { height: 40px; } }`;
   document.head.appendChild(css);
 
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'dsw-btn';
-  btn.textContent = '🔀';
+  btn.innerHTML = '<span style="font-size:18px" aria-hidden="true">🔀</span>Giao diện';
   btn.title = 'Chuyển giao diện';
   btn.setAttribute('aria-label', 'Chuyển giao diện');
   btn.setAttribute('aria-expanded', 'false');
