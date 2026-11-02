@@ -1361,6 +1361,15 @@ function viewCommunity() {
 }
 
 // ================= Cài đặt & nhắc nhở =================
+// Các giao diện của cùng một app (index.html mở giao diện đã chọn).
+const UI_KEY = 'engmate-ui';
+const UI_OPTIONS = [
+  { id: 'app', icon: '📱', name: 'Chuẩn', desc: 'đầy đủ tính năng', page: 'app.html' },
+  { id: 'ai-tutor', icon: '🤖', name: 'Gia sư AI', desc: 'tông tím, 5 tab', page: 'ai-tutor.html' },
+  { id: 'demo02', icon: '✨', name: 'Demo 02', desc: 'chuyển màu, gọn', page: 'demo02.html' },
+];
+const currentUI = () => { try { return localStorage.getItem(UI_KEY) || 'app'; } catch { return 'app'; } };
+
 function viewSettings() {
   const s = state.settings;
   view.innerHTML = `<div class="spread"><h1>⚙️ Cài đặt</h1><a href="#/profile">← Quay lại</a></div>
@@ -1378,6 +1387,12 @@ function viewSettings() {
       <label class="row" style="font-weight:400"><input type="checkbox" id="st-rem" style="width:auto" ${s.reminders ? 'checked' : ''}> Nhắc tôi học mỗi ngày lúc</label>
       <input type="time" id="st-time" value="${s.reminderTime}">
       <p class="muted small">Thông báo hiện khi trang EngMate đang mở (hoặc đã cài lên màn hình chính) và hôm đó bạn chưa học.</p>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">🎨 Giao diện</h2>
+      <p class="muted small">Cùng một app, cùng tiến độ học; chỉ khác cách trình bày. Lần sau mở app sẽ vào đúng giao diện bạn chọn.</p>
+      ${UI_OPTIONS.map(o => `<label class="row" style="font-weight:600;margin:8px 0"><input type="radio" name="st-ui" value="${o.id}" style="width:auto" ${currentUI() === o.id ? 'checked' : ''}> ${o.icon} ${o.name} <span class="muted small">${o.desc}</span></label>`).join('')}
+      <p class="small" style="margin-top:10px"><a href="gioi-thieu.html">🏠 Xem trang giới thiệu app</a></p>
     </div>
     <div class="card">
       <h2 style="margin-top:0">🤖 Gia sư AI (Claude)</h2>
@@ -1428,6 +1443,12 @@ function viewSettings() {
     } catch { toast('File không hợp lệ'); }
   };
   $('#st-retest').onclick = () => go('#/placement');
+  $$('input[name="st-ui"]').forEach(r => r.onchange = () => {
+    try { localStorage.setItem(UI_KEY, r.value); } catch { /* bỏ qua */ }
+    const page = UI_OPTIONS.find(o => o.id === r.value).page;
+    if (page !== 'app.html') location.href = page;
+    else toast('Đang dùng giao diện chuẩn ✔');
+  });
   $('#st-reset').onclick = () => {
     if (!confirm('Xóa toàn bộ tiến độ, XP, huy hiệu và thẻ từ vựng? Không thể hoàn tác.')) return;
     localStorage.removeItem(STORE);

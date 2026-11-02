@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f172a">
+  <title>EngMate – Học tiếng Anh thông minh cùng AI</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <script>
+    // Màn hình hẹp (điện thoại): vào thẳng ứng dụng.
+    if (window.innerWidth < 1024) location.replace('app.html' + location.hash);
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a; --panel: rgba(30, 41, 59, .5); --line: #1e293b; --line2: rgba(51, 65, 85, .6);
+      --text: #f1f5f9; --muted: #94a3b8; --brand: #22c55e; --emerald: #34d399; --sky: #38bdf8;
+      --purple: #a78bfa; --amber: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif; overflow-x: hidden;
+    }
+    .wrap { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--line); }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+    .logo-mark {
+      width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; font-size: 22px;
+      background: linear-gradient(45deg, var(--brand), #6ee7b7); box-shadow: 0 8px 20px rgba(34, 197, 94, .3);
+    }
+    .logo h1 { margin: 0; font-size: 18px; line-height: 1; }
+    .logo p { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
+    .pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(34, 197, 94, .2); color: var(--brand); border: 1px solid rgba(34, 197, 94, .3); }
+    .head-right { display: flex; align-items: center; gap: 14px; font-size: 14px; color: #cbd5e1; }
+    .fire { color: var(--amber); background: rgba(251, 191, 36, .1); border: 1px solid rgba(251, 191, 36, .2); padding: 6px 12px; border-radius: 99px; }
+
+    main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding-top: 36px; padding-bottom: 36px; }
+    .eyebrow {
+      display: inline-flex; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--brand); background: rgba(34, 197, 94, .1); border: 1px solid rgba(34, 197, 94, .2); padding: 4px 12px; border-radius: 99px;
+    }
+    h2 { font-size: 48px; line-height: 1.12; font-weight: 800; margin: 18px 0; }
+    .grad { background: linear-gradient(90deg, var(--brand), var(--emerald), var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lead { color: var(--muted); line-height: 1.7; margin: 0 0 22px; }
+
+    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 6px; background: rgba(30, 41, 59, .8); border: 1px solid var(--line2); border-radius: 18px; }
+    .tab {
+      display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px; border: none; border-radius: 12px;
+      background: transparent; color: var(--muted); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: .2s;
+    }
+    .tab span { font-size: 18px; }
+    .tab:hover { color: #e2e8f0; background: rgba(51, 65, 85, .5); }
+    .tab.active { background: var(--brand); color: #0f172a; box-shadow: 0 6px 16px rgba(34, 197, 94, .2); }
+
+    .desc { margin-top: 16px; background: var(--panel); border: 1px solid var(--line2); border-radius: 18px; padding: 20px; min-height: 170px; }
+    .desc h3 { margin: 0 0 8px; font-size: 18px; display: flex; gap: 8px; align-items: center; }
+    .desc p { margin: 0 0 10px; font-size: 13px; line-height: 1.7; color: #cbd5e1; }
+    .desc b { color: #fff; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chips span { font-size: 11px; padding: 4px 10px; border-radius: 6px; background: rgba(51, 65, 85, .6); color: #cbd5e1; }
+    .c-brand h3 { color: var(--brand); } .c-purple h3 { color: var(--purple); } .c-purple .chips span { background: rgba(167, 139, 250, .2); color: #ddd6fe; }
+    .c-sky h3 { color: var(--sky); } .c-sky .chips span { background: rgba(56, 189, 248, .2); color: #bae6fd; }
+    .c-amber h3 { color: var(--amber); } .c-amber .chips span { background: rgba(251, 191, 36, .2); color: #fde68a; }
+    .shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .shortcuts button { font: inherit; font-size: 12px; font-weight: 700; color: var(--text); background: rgba(51, 65, 85, .6); border: 1px solid var(--line2); border-radius: 10px; padding: 6px 10px; cursor: pointer; }
+    .shortcuts button:hover { border-color: var(--brand); }
+    .foot-badges { display: flex; justify-content: space-between; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+
+    /* Khung điện thoại */
+    .stage { position: relative; display: flex; justify-content: center; }
+    .glow { position: absolute; border-radius: 50%; filter: blur(64px); z-index: -1; }
+    .glow.g1 { width: 300px; height: 300px; background: rgba(34, 197, 94, .2); top: 50%; transform: translateY(-50%); }
+    .glow.g2 { width: 240px; height: 240px; background: rgba(139, 92, 246, .2); top: 15%; }
+    .phone {
+      width: 380px; height: min(780px, calc(100vh - 140px)); min-height: 600px; display: flex; flex-direction: column;
+      background: #020617; border: 4px solid #1e293b; border-radius: 48px; padding: 12px; box-shadow: 0 25px 60px rgba(0, 0, 0, .8), 0 0 0 1px rgba(51, 65, 85, .5);
+    }
+    .status { display: flex; justify-content: space-between; align-items: center; padding: 2px 22px 6px; font-size: 11px; color: #cbd5e1; }
+    .island { width: 96px; height: 18px; border-radius: 99px; background: #0f172a; border: 1px solid #1e293b; display: flex; justify-content: flex-end; align-items: center; padding: 0 8px; }
+    .island i { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); animation: ping 1.6s infinite; }
+    @keyframes ping { 50% { opacity: .3; transform: scale(1.6); } }
+    .screen { flex: 1; border-radius: 36px; overflow: hidden; border: 1px solid #1e293b; background: #111827; }
+    .screen iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .home-bar { display: flex; justify-content: center; padding-top: 8px; } .home-bar i { width: 120px; height: 4px; border-radius: 4px; background: #334155; }
+
+    .btn-open {
+      display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 800; border-radius: 14px; padding: 12px 20px;
+      background: var(--brand); color: #0f172a; box-shadow: 0 8px 20px rgba(34, 197, 94, .3); transition: transform .15s;
+    }
+    .btn-open:hover { transform: translateY(-2px); }
+    .btn-open.ghost { background: rgba(51, 65, 85, .6); color: var(--text); box-shadow: none; border: 1px solid var(--line2); }
+    .btn-open.sm { padding: 8px 14px; font-size: 13px; border-radius: 12px; }
+    .cta { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 22px; }
+    .file-note { height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 24px; text-align: center; font-size: 13px; line-height: 1.6; color: #cbd5e1; }
+    .file-note code { display: block; background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 8px; color: var(--emerald); font-size: 12px; }
+    footer { text-align: center; font-size: 12px; color: #64748b; padding: 16px; border-top: 1px solid rgba(30, 41, 59, .6); }
+    footer a { color: var(--muted); }
+    @media (max-width: 1180px) { h2 { font-size: 38px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="app.html">
+      <div class="logo-mark">🦉</div>
+      <div><h1>EngMate <span class="pill">AI</span></h1><p>App học tiếng Anh thông minh thế hệ mới</p></div>
+    </a>
+    <div class="head-right"><span class="fire">🔥 Gia sư AI · Lộ trình cá nhân hóa</span><span>🎓 Lộ trình A1 → C2</span>
+      <a class="btn-open sm ghost" href="ai-tutor.html">🤖 Gia sư AI</a>
+      <a class="btn-open sm" href="app.html">🚀 Mở app</a></div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <span class="eyebrow">✨ Trải nghiệm trực tiếp</span>
+      <h2>Học tiếng Anh toàn diện cùng <span class="grad">Gia sư AI</span></h2>
+      <p class="lead">Kiểm tra đầu vào, lộ trình A1–C2, bài học 5 bước, ôn tập ngắt quãng (SRS) và gia sư AI đa nhân cách. Chiếc điện thoại bên phải là ứng dụng thật: bạn có thể bấm và học ngay trong đó.</p>
+      <div class="cta">
+        <a class="btn-open" href="app.html">🚀 Mở ứng dụng</a>
+        <a class="btn-open ghost" href="app.html#/placement">📝 Kiểm tra đầu vào</a>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="home"><span>🧭</span>1. Lộ trình</button>
+        <button class="tab" data-tab="chat"><span>🤖</span>2. Gia sư AI</button>
+        <button class="tab" data-tab="review"><span>🧠</span>3. Bài tập SRS</button>
+        <button class="tab" data-tab="profile"><span>🏆</span>4. Gamification</button>
+      </div>
+
+      <div class="desc c-brand" data-desc="home">
+        <h3>🗺️ Lộ trình cá nhân hóa & cấu trúc 5 bước</h3>
+        <p>Người học làm bài kiểm tra đầu vào để xếp lớp A1–C2. Mỗi bài học gồm 5 bước: <b>Khởi động → Giới thiệu → Luyện tập → Vận dụng → Ôn tập</b>, bao quát từ vựng, ngữ pháp, phát âm, nghe – nói – đọc – viết.</p>
+        <div class="chips"><span>🔥 Chuỗi ngày học</span><span>🎯 Nhiệm vụ hằng ngày</span><span>👨‍👩‍👧 Bài học theo 4 lứa tuổi</span><span>📝 Kiểm tra định kỳ</span><span>📜 Chứng chỉ nội bộ</span></div>
+        <div class="shortcuts"><button data-go="#/path">Mở lộ trình A1–C2</button><button data-go="#/lesson/a1-1">Thử một bài học</button></div>
+      </div>
+      <div class="desc c-purple" data-desc="chat" hidden>
+        <h3>🎧 Gia sư AI đa nhân cách & luyện nói</h3>
+        <p>Nhập vai cùng <b>Jake (bạn bản xứ)</b>, <b>Ms. Carter (HR khó tính)</b> hay <b>hướng dẫn viên du lịch</b>. Bấm 🎲 để AI tạo tình huống bất ngờ, bấm 📞 để nói chuyện bằng giọng như một cuộc gọi. AI sửa lỗi ngay trong từng câu.</p>
+        <div class="chips"><span>🎙️ Voice-to-Voice</span><span>🎭 Plot twist</span><span>✏️ Sửa lỗi tức thì</span><span>🗣️ Chấm phát âm từng từ</span><span>🐢 Tốc độ đọc 0.75x–1.0x</span><span>🌊 Sóng âm khi nói</span></div>
+        <div class="shortcuts"><button data-go="#/ailab/write">✍️ Trợ lý viết</button><button data-go="#/ailab/story">📚 Truyện AI</button><button data-go="#/ailab/analyze">📝 Phân tích bài văn</button><button data-go="#/ailab/dict">📖 Từ điển & phát âm</button></div>
+      </div>
+      <div class="desc c-sky" data-desc="review" hidden>
+        <h3>🗂️ Lặp lại ngắt quãng (AI-SRS) & bài tập</h3>
+        <p>Thẻ từ vựng quay lại đúng lúc sắp quên; từ hay quên được ôn sớm hơn và được gia sư AI lồng vào hội thoại. Bài tập đa dạng: <b>trắc nghiệm, nối từ, sắp xếp câu, nghe chép</b>, cùng bài luyện điểm yếu do AI tạo riêng.</p>
+        <div class="chips"><span>🎴 Flashcard lật</span><span>🎯 Luyện điểm yếu</span><span>🧠 Từ khó ưu tiên</span></div>
+        <div class="shortcuts"><button data-go="#/ailab/weak">🎯 Luyện điểm yếu</button></div>
+      </div>
+      <div class="desc c-amber" data-desc="profile" hidden>
+        <h3>🛡️ Trò chơi hóa & Đấu trường AI</h3>
+        <p>XP, chuỗi ngày học, huy hiệu, bảng xếp hạng tuần, biểu đồ tiến độ và chứng chỉ nội bộ. Thắng AI ở <b>Đấu trường từ vựng</b> để nhận XP và mở khóa avatar cho gia sư.</p>
+        <div class="chips"><span>⚔️ Đấu trường AI</span><span>🎖️ Huy hiệu</span><span>📈 Biểu đồ tiến độ</span></div>
+        <div class="shortcuts"><button data-go="#/battle">⚔️ Vào Đấu trường</button><button data-go="#/community">👥 Cộng đồng</button></div>
+      </div>
+
+      <div class="foot-badges"><span>📴 Học offline</span><span>🔔 Nhắc nhở thông minh</span><span>👥 Cộng đồng chia sẻ</span><span>📱 Cài như app</span></div>
+    </section>
+
+    <section class="stage">
+      <div class="glow g1"></div><div class="glow g2"></div>
+      <div class="phone">
+        <div class="status"><b id="clock">9:41</b><div class="island"><i></i></div><span>📶 🔋</span></div>
+        <div class="screen"><iframe id="app" title="Ứng dụng EngMate" src="app.html?theme=dark#/home" allow="microphone; autoplay"></iframe></div>
+        <div class="home-bar"><i></i></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>EngMate © 2026 · <a href="app.html">Mở ứng dụng toàn màn hình</a> · <a href="ai-tutor.html">Gia sư AI</a> · <a href="demo02.html">Demo 02</a></footer>
+
+  <script>
+    const frame = document.getElementById('app');
+    const tabs = [...document.querySelectorAll('.tab')];
+    const descs = [...document.querySelectorAll('[data-desc]')];
+    const TAB_OF = { home: 'home', path: 'home', lesson: 'home', test: 'home', cert: 'profile', chat: 'chat', ailab: 'chat',
+      review: 'review', profile: 'profile', battle: 'profile', community: 'profile', settings: 'profile' };
+
+    const highlight = tab => {
+      tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      descs.forEach(d => { d.hidden = d.dataset.desc !== tab; });
+    };
+    const navigate = hash => {
+      try { frame.contentWindow.location.hash = hash; } catch { frame.src = 'app.html?theme=dark' + hash; }
+    };
+    tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); navigate('#/' + t.dataset.tab); });
+    document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => navigate(b.dataset.go));
+
+      // Đồng bộ tab bên trái khi người dùng bấm trong điện thoại.
+      frame.addEventListener('load', () => {
+        try {
+          const sync = () => {
+            const route = frame.contentWindow.location.hash.replace(/^#\//, '').split('/')[0] || 'home';
+            if (TAB_OF[route]) highlight(TAB_OF[route]);
+          };
+          frame.contentWindow.addEventListener('hashchange', sync);
+          sync();
+        } catch { /* mở bằng file:// thì khung bị chặn truy cập: các tab bên trái vẫn hoạt động */ }
+      });
+
+    const tick = () => { const d = new Date(); document.getElementById('clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    tick(); setInterval(tick, 30000);
+  </script>
+</body>
+</html>
