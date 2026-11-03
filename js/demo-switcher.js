@@ -2,7 +2,8 @@
 // Bấm vào: lưu lựa chọn giao diện chuẩn và mở app chính đúng màn hình đang xem.
 // Chọn giao diện khác trong app: Thành tích → Cài đặt → Giao diện.
 (() => {
-  if (window.top !== window) return;
+  // Đang nằm trong khung điện thoại của trang giới thiệu: báo đã tải xong để trang đó biết khung không bị trống.
+  if (window.top !== window) { window.parent.postMessage({ engmate: 'ready' }, '*'); return; }
 
   // Màn hình tương ứng ở app chính
   const ROUTE = { home: '#/home', path: '#/path', ai: '#/chat', chat: '#/chat', writing: '#/ailab/write', review: '#/review', achievement: '#/profile' };

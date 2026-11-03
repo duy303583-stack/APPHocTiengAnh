@@ -1505,6 +1505,7 @@ checkReminder();
 checkBadges();
 if (window.REQUIRE_LOGIN) validateSession().then(ok => { authed = ok; router(); });
 else router();
+if (window.top !== window) window.parent.postMessage({ engmate: 'ready' }, '*'); // trang giới thiệu biết khung đã tải
 detectServer().then(async s => {
   if (!s.online) return;
   if (await pullProgress()) router();
