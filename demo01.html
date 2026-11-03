@@ -33,7 +33,7 @@
     .head-right { display: flex; align-items: center; gap: 14px; font-size: 14px; color: #cbd5e1; }
     .fire { color: var(--amber); background: rgba(251, 191, 36, .1); border: 1px solid rgba(251, 191, 36, .2); padding: 6px 12px; border-radius: 99px; }
 
-    main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding-top: 36px; padding-bottom: 36px; }
+    main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; padding-top: 36px; padding-bottom: 36px; }
     .eyebrow {
       display: inline-flex; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
       color: var(--brand); background: rgba(34, 197, 94, .1); border: 1px solid rgba(34, 197, 94, .2); padding: 4px 12px; border-radius: 99px;
@@ -80,6 +80,7 @@
     .btn-open[aria-pressed="true"] { background: #fb7185; box-shadow: 0 8px 20px rgba(251, 113, 133, .3); }
     .phones { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
     .dual-note { margin: 0; font-size: 12px; color: var(--muted); text-align: center; max-width: 520px; }
+    .dual-note a { color: var(--emerald); }
     body.dual main { grid-template-columns: minmax(0, 1fr) auto; }
     body.dual .phone { width: 330px; }
     .glow { position: absolute; border-radius: 50%; filter: blur(64px); z-index: -1; }
@@ -227,6 +228,7 @@
           <div class="home-bar"><i></i></div>
         </div>
       </div>
+      <p class="dual-note">Khung trống? <a href="app.html" id="open-1" target="_blank" rel="noopener">Mở app trong tab mới ↗</a></p>
       <p class="dual-note" id="dual-note" hidden>Hai máy dùng chung dữ liệu học: XP, từ vựng, tiến độ đổi ở máy này sẽ hiện ở máy kia.</p>
     </section>
   </main>
@@ -277,7 +279,7 @@
     };
     document.getElementById('pick-2').value = 'demo03.html?theme=dark';
     document.getElementById('dual-btn').onclick = () => setDual(!document.body.classList.contains('dual'));
-    document.getElementById('pick-1').onchange = e => { frame.src = e.target.value; };
+    document.getElementById('pick-1').onchange = e => { frame.src = e.target.value; document.getElementById('open-1').href = e.target.value; };
     document.getElementById('pick-2').onchange = e => { frame2.src = e.target.value; };
     if (new URLSearchParams(location.search).has('dual')) setDual(true);
 
