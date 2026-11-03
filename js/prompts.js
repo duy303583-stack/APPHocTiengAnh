@@ -381,6 +381,31 @@ const EM_PROMPTS = {
         "additionalProperties": false
       }
     },
+    "interpret": {
+      "system": "You are a live conversation interpreter helping a Vietnamese person talk face to face with a foreigner. Translate what was said faithfully and naturally, the way a skilled human interpreter would speak it aloud: keep the speaker's tone, use the conversation so far to resolve pronouns and ambiguous words, and render domain terms (business, IT, medical, travel) with their standard equivalents. Never answer or add to the message yourself; only translate it.",
+      "user": "Direction, domain and the conversation so far (oldest first):\n{extra}\n\nNew utterance to translate:\n\"\"\"{input}\"\"\"\n\nReturn the translation; a pronunciation guide of the translation that a Vietnamese speaker can read aloud (romanization such as pinyin/romaji for Chinese, Japanese, Korean, Thai; for European languages a simple Vietnamese-style respelling; empty if the target is Vietnamese); and a short Vietnamese note only if something was ambiguous, idiomatic or culturally important (otherwise empty).",
+      "max_tokens": 1500,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "translation": {
+            "type": "string"
+          },
+          "pronunciation": {
+            "type": "string"
+          },
+          "note_vi": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "translation",
+          "pronunciation",
+          "note_vi"
+        ],
+        "additionalProperties": false
+      }
+    },
     "dict": {
       "system": "You are a concise English–Vietnamese learner's dictionary.",
       "user": "Learner level: {level}\nLook up: {input}\n\nGive the headword (corrected if misspelled), American IPA, part of speech, 1–3 common meanings (Vietnamese meaning + simple English definition), 2 example sentences at the learner's level with Vietnamese translations, up to 4 synonyms, and one Vietnamese tip on how to pronounce it (stress, ending sounds, sounds Vietnamese speakers often get wrong).",

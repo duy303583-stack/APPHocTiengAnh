@@ -22,11 +22,12 @@ function speak(text, rate = 0.95, onEnd, lang = 'en-US') {
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const canListen = !!Recognition;
 
-function listen() {
+// lang: ngôn ngữ người nói, ví dụ 'en-US', 'vi-VN', 'ja-JP'.
+function listen(lang = 'en-US') {
   return new Promise((resolve, reject) => {
     if (!Recognition) return reject(new Error('Trình duyệt không hỗ trợ nhận dạng giọng nói (hãy dùng Chrome hoặc Edge).'));
     const r = new Recognition();
-    r.lang = 'en-US';
+    r.lang = lang;
     r.interimResults = false;
     r.maxAlternatives = 1;
     r.onresult = e => resolve(e.results[0][0].transcript);
