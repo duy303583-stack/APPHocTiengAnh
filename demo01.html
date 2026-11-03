@@ -42,7 +42,7 @@
     .grad { background: linear-gradient(90deg, var(--brand), var(--emerald), var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lead { color: var(--muted); line-height: 1.7; margin: 0 0 22px; }
 
-    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 6px; background: rgba(30, 41, 59, .8); border: 1px solid var(--line2); border-radius: 18px; }
+    .tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 6px; background: rgba(30, 41, 59, .8); border: 1px solid var(--line2); border-radius: 18px; }
     .tab {
       display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px; border: none; border-radius: 12px;
       background: transparent; color: var(--muted); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: .2s;
@@ -59,6 +59,13 @@
     .chips span { font-size: 11px; padding: 4px 10px; border-radius: 6px; background: rgba(51, 65, 85, .6); color: #cbd5e1; }
     .c-brand h3 { color: var(--brand); } .c-purple h3 { color: var(--purple); } .c-purple .chips span { background: rgba(167, 139, 250, .2); color: #ddd6fe; }
     .c-sky h3 { color: var(--sky); } .c-sky .chips span { background: rgba(56, 189, 248, .2); color: #bae6fd; }
+    .c-rose h3 { color: #fb7185; }
+    .tab.tab-new:not(.active) span { animation: ping 1.6s infinite; }
+    .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .feat-grid button { text-align: left; font: inherit; color: var(--text); background: rgba(51, 65, 85, .5); border: 1px solid var(--line2); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+    .feat-grid button:hover { border-color: #fb7185; }
+    .feat-grid b { display: block; font-size: 13px; } .feat-grid small { display: block; margin-top: 2px; font-size: 11px; line-height: 1.5; color: var(--muted); }
+    @media (max-width: 520px) { .feat-grid { grid-template-columns: 1fr; } }
     .c-amber h3 { color: var(--amber); } .c-amber .chips span { background: rgba(251, 191, 36, .2); color: #fde68a; }
     .shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .shortcuts button { font: inherit; font-size: 12px; font-weight: 700; color: var(--text); background: rgba(51, 65, 85, .6); border: 1px solid var(--line2); border-radius: 10px; padding: 6px 10px; cursor: pointer; }
@@ -105,6 +112,7 @@
       .fire, .head-right > span:not(.fire) { display: none; }
       h2 { font-size: 30px; }
       .tabs { grid-template-columns: repeat(2, 1fr); }
+      .tab-new { grid-column: span 2; }
       .foot-badges { flex-wrap: wrap; }
       .phone { width: min(380px, 100%); height: 720px; min-height: 0; }
     }
@@ -138,6 +146,7 @@
         <button class="tab" data-tab="chat"><span>🤖</span>2. Gia sư AI</button>
         <button class="tab" data-tab="review"><span>🧠</span>3. Bài tập SRS</button>
         <button class="tab" data-tab="profile"><span>🏆</span>4. Gamification</button>
+        <button class="tab tab-new" data-tab="new" data-route="#/ailab/listen"><span>🆕</span>5. Tính năng mới</button>
       </div>
 
       <div class="desc c-brand" data-desc="home">
@@ -163,6 +172,19 @@
         <p>XP, chuỗi ngày học, huy hiệu, bảng xếp hạng tuần, biểu đồ tiến độ và chứng chỉ nội bộ. Thắng AI ở <b>Đấu trường từ vựng</b> để nhận XP và mở khóa avatar cho gia sư.</p>
         <div class="chips"><span>⚔️ Đấu trường AI</span><span>🎖️ Huy hiệu</span><span>📈 Biểu đồ tiến độ</span></div>
         <div class="shortcuts"><button data-go="#/battle">⚔️ Vào Đấu trường</button><button data-go="#/community">👥 Cộng đồng</button></div>
+      </div>
+
+      <div class="desc c-rose" data-desc="new" hidden>
+        <h3>🆕 6 tính năng mới: Nghe, đọc & phiên dịch</h3>
+        <p>Học nghe – nói như có trợ lý riêng: app <b>đọc to văn bản</b>, chỉ cách phát âm <b>từ mới</b>, tạo <b>kịch bản đọc</b> không giới hạn và <b>phiên dịch giọng nói</b> để bạn trò chuyện trực tiếp với người nước ngoài.</p>
+        <div class="feat-grid">
+          <button data-go="#/ailab/listen"><b>🎧 Đọc to văn bản & PDF</b><small>Tiếng Anh, tiếng Việt · tô sáng câu đang đọc · chỉnh tốc độ</small></button>
+          <button data-go="#/ailab/listen"><b>🔤 Hướng dẫn phát âm</b><small>Tự đánh dấu từ mới · IPA · đánh vần · đọc chậm từng âm tiết</small></button>
+          <button data-go="#/ailab/listen"><b>🗞️ Kịch bản đọc mỗi ngày</b><small>Bấm bao nhiêu lần cũng được, mỗi lần một nội dung mới</small></button>
+          <button data-go="#/ailab/listen"><b>📒 Sổ tay từ vựng</b><small>Bôi đen để lưu · kèm phát âm · tự vào thẻ ôn tập</small></button>
+          <button data-go="#/ailab/interpret"><b>🗣️ Phiên dịch giọng nói</b><small>Việt ⇄ Anh, Trung, Nhật, Hàn, Pháp, Đức, Tây Ban Nha, Thái</small></button>
+          <button data-go="#/ailab/interpret"><b>📞 Hội thoại tự động</b><small>Hai bên nói lần lượt · hiện to câu dịch · câu mẫu offline</small></button>
+        </div>
       </div>
 
       <div class="foot-badges"><span>📴 Học offline</span><span>🔔 Nhắc nhở thông minh</span><span>👥 Cộng đồng chia sẻ</span><span>📱 Cài như app</span></div>
@@ -194,7 +216,7 @@
     const navigate = hash => {
       try { frame.contentWindow.location.hash = hash; } catch { frame.src = 'app.html?theme=dark' + hash; }
     };
-    tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); navigate('#/' + t.dataset.tab); });
+    tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); navigate(t.dataset.route || '#/' + t.dataset.tab); });
     document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => navigate(b.dataset.go));
 
       // Đồng bộ tab bên trái khi người dùng bấm trong điện thoại.
@@ -202,7 +224,9 @@
         try {
           const sync = () => {
             const route = frame.contentWindow.location.hash.replace(/^#\//, '').split('/')[0] || 'home';
-            if (TAB_OF[route]) highlight(TAB_OF[route]);
+            const tool = frame.contentWindow.location.hash.split('/')[2];
+            if (route === 'ailab' && (tool === 'listen' || tool === 'interpret')) highlight('new');
+            else if (TAB_OF[route]) highlight(TAB_OF[route]);
           };
           frame.contentWindow.addEventListener('hashchange', sync);
           sync();
