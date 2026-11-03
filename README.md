@@ -31,7 +31,7 @@ Không có API key thì mọi thứ vẫn chạy, chỉ các tính năng AI bị
 | `gioi-thieu.html` | Trang giới thiệu (showcase), app nằm trong khung điện thoại |
 | `app.html`, `styles.css` | Giao diện ứng dụng |
 | `demo01.html` | Demo 01: trang trình bày nền tối, app chạy thật trong khung điện thoại (xếp một cột trên điện thoại) |
-| `demo03.html` | Demo 03: app có Đăng nhập → Trang chờ (bảng 8 bước kiểm tra trực quan: vàng = đang kiểm tra, xanh ✔ = đạt, đỏ ✖ = lỗi kèm giải thích; có lỗi thì khóa nút vào học, hiện Thử lại / Khôi phục tài khoản) → Kiểm tra đầu vào → Phân hệ học tập (`js/auth.js`: mật khẩu băm PBKDF2-SHA-256 có salt, khóa 60 giây sau 5 lần sai, phiên đăng nhập có hạn) |
+| `demo03.html` | Demo 03: app có Đăng nhập → Trang chờ (bảng 8 bước kiểm tra trực quan: vàng = đang kiểm tra, xanh ✔ = đạt, đỏ ✖ = lỗi kèm giải thích; có lỗi thì khóa nút vào học, hiện Thử lại / Khôi phục tài khoản) → Kiểm tra đầu vào → Phân hệ học tập (`js/auth.js`: mật khẩu băm PBKDF2-SHA-256 có salt, khóa 60 giây sau 5 lần sai, có mục Đăng nhập / Đăng ký nhiều tài khoản, "Ghi nhớ đăng nhập" không hết hạn) |
 | `demo02.html` | Bản giao diện đẹp hơn của Gia sư AI: nền chuyển màu, vòng mục tiêu hôm nay, 7 ngày học, chat có avatar, chế độ tối |
 | `js/demo-switcher.js` | Nút "↩ Giao diện chuẩn" trên các giao diện phụ (đổi giao diện trong Thành tích → Cài đặt → Giao diện) |
 | `ai-tutor.html` | Giao diện gọn "Gia sư AI" (tông tím): chat nhập vai + trợ lý viết, dùng chung AI và XP với app |

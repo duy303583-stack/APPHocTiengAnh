@@ -361,3 +361,6 @@ details.card summary { cursor: pointer; }
 .boot-step.fail b, .boot-step.fail .bs-note { color: var(--bad); }
 @keyframes bs-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .boot-step.doing .bs-st { animation: none; } }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; margin: 6px 0 12px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+.auth-tabs button { border: none; background: none; padding: 10px 6px; border-radius: 12px; font-weight: 800; color: var(--muted); }
+.auth-tabs button.on { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(99, 102, 241, .3); }
