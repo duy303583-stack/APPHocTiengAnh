@@ -234,6 +234,7 @@ function router() {
   const [name, arg] = location.hash.replace(/^#\//, '').split('/');
   document.body.classList.remove('no-tabs');
   applyAgeClass();
+  if (window.REQUIRE_LOGIN && !authed) return viewLogin(); // Demo 03: phải đăng nhập trước
   if (!state.profile.onboarded && name !== 'placement') return viewOnboard();
   const fn = routes[name] || viewHome;
   $$('#tabbar a').forEach(a => a.classList.toggle('active', a.dataset.tab === (routes[name] ? name : 'home')));
@@ -1383,6 +1384,7 @@ const UI_OPTIONS = [
   { id: 'ai-tutor', icon: '🤖', name: 'Gia sư AI', desc: 'tông tím, 5 tab', page: 'ai-tutor.html' },
   { id: 'demo01', icon: '🖥️', name: 'Demo 01', desc: 'khung điện thoại', page: 'demo01.html' },
   { id: 'demo02', icon: '✨', name: 'Demo 02', desc: 'chuyển màu, gọn', page: 'demo02.html' },
+  { id: 'demo03', icon: '🔐', name: 'Demo 03', desc: 'đăng nhập & vào học', page: 'demo03.html' },
 ];
 const currentUI = () => { try { return localStorage.getItem(UI_KEY) || 'app'; } catch { return 'app'; } };
 
@@ -1416,6 +1418,7 @@ function viewSettings() {
       <input id="st-key" type="password" placeholder="sk-ant-..." value="${esc(s.apiKey)}" autocomplete="off">
       <p class="muted small">${server.ai ? '✅ Máy chủ Python đã có sẵn gia sư AI, bạn không cần nhập key.' : 'Lấy key tại console.anthropic.com.'} Key nhập ở đây chỉ được lưu trong trình duyệt trên máy này và chỉ gửi tới Anthropic.</p>
     </div>
+    ${window.REQUIRE_LOGIN ? `<div class="card"><b>🔐 Tài khoản</b><p class="muted small">Đang đăng nhập: <b>${esc(authUser())}</b></p><button class="btn ghost sm" id="st-logout">🚪 Đăng xuất</button></div>` : ''}
     <button class="btn block" id="st-save">Lưu cài đặt</button>
     <div class="card" style="margin-top:16px">
       <h2 style="margin-top:0">Dữ liệu</h2>
@@ -1459,6 +1462,7 @@ function viewSettings() {
     } catch { toast('File không hợp lệ'); }
   };
   $('#st-retest').onclick = () => go('#/placement');
+  if ($('#st-logout')) $('#st-logout').onclick = logout;
   $$('input[name="st-ui"]').forEach(r => r.onchange = () => {
     try { localStorage.setItem(UI_KEY, r.value); } catch { /* bỏ qua */ }
     const page = UI_OPTIONS.find(o => o.id === r.value).page;
@@ -1499,7 +1503,8 @@ if (!state.userId) { state.userId = crypto.randomUUID(); save(); }
 setInterval(checkReminder, 60 * 1000);
 checkReminder();
 checkBadges();
-router();
+if (window.REQUIRE_LOGIN) validateSession().then(ok => { authed = ok; router(); });
+else router();
 detectServer().then(async s => {
   if (!s.online) return;
   if (await pullProgress()) router();

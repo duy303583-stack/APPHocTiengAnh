@@ -10,7 +10,7 @@
   <script>
     // Cổng vào duy nhất của app: mở đúng giao diện người dùng đã chọn trong Cài đặt (mặc định: app chính).
     (() => {
-      const PAGES = { app: 'app.html', 'ai-tutor': 'ai-tutor.html', demo01: 'demo01.html', demo02: 'demo02.html' };
+      const PAGES = { app: 'app.html', 'ai-tutor': 'ai-tutor.html', demo01: 'demo01.html', demo02: 'demo02.html', demo03: 'demo03.html' };
       let ui = 'app';
       try { ui = localStorage.getItem('engmate-ui') || 'app'; } catch { /* trình duyệt chặn lưu trữ: dùng mặc định */ }
       location.replace((PAGES[ui] || PAGES.app) + location.hash);
