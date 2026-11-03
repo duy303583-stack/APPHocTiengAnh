@@ -20,18 +20,18 @@ const LEVEL_INFO = {
 
 // Câu hỏi xếp lớp: sắp theo độ khó tăng dần, 2 câu mỗi cấp độ.
 const PLACEMENT = [
-  { level: 'A1', q: 'Hello! My name ___ Lan.', options: ['am', 'is', 'are', 'be'], answer: 1 },
-  { level: 'A1', q: 'Chọn nghĩa đúng của "apple".', options: ['quả chuối', 'quả táo', 'quả cam', 'quả nho'], answer: 1 },
-  { level: 'A2', q: 'Yesterday I ___ to the cinema with my friends.', options: ['go', 'goes', 'went', 'going'], answer: 2 },
-  { level: 'A2', q: 'This bag is ___ than that one.', options: ['heavy', 'heavier', 'heaviest', 'more heavy'], answer: 1 },
-  { level: 'B1', q: 'I have lived here ___ 2015.', options: ['for', 'since', 'from', 'during'], answer: 1 },
-  { level: 'B1', q: 'If it rains tomorrow, we ___ at home.', options: ['stay', 'stayed', 'will stay', 'would stay'], answer: 2 },
-  { level: 'B2', q: 'The report ___ by the manager before the meeting started.', options: ['had been checked', 'has checked', 'was checking', 'checks'], answer: 0 },
-  { level: 'B2', q: 'I wish I ___ more time to travel last year.', options: ['have', 'had', 'had had', 'would have'], answer: 2 },
-  { level: 'C1', q: '___ had I arrived than the phone started ringing.', options: ['Hardly', 'No sooner', 'Barely', 'Scarcely'], answer: 1 },
-  { level: 'C1', q: 'Chọn từ gần nghĩa nhất với "meticulous".', options: ['careless', 'thorough', 'generous', 'anxious'], answer: 1 },
-  { level: 'C2', q: 'His argument, though superficially persuasive, does not ___ scrutiny.', options: ['bear up to', 'stand up to', 'hold on to', 'put up with'], answer: 1 },
-  { level: 'C2', q: 'Chọn nghĩa đúng của "to pay lip service to".', options: ['ủng hộ nhiệt tình', 'chỉ nói suông, không làm thật', 'trả tiền trước', 'phê phán gay gắt'], answer: 1 },
+  { level: 'A1', q: 'Hello! My name ___ Lan.', options: ['am', 'is', 'are', 'be'], answer: 1, why: 'Chủ ngữ "My name" là ngôi thứ ba số ít nên dùng "is".' },
+  { level: 'A1', q: 'Chọn nghĩa đúng của "apple".', options: ['quả chuối', 'quả táo', 'quả cam', 'quả nho'], answer: 1, why: '"apple" nghĩa là quả táo (quả chuối: banana, quả cam: orange, quả nho: grape).' },
+  { level: 'A2', q: 'Yesterday I ___ to the cinema with my friends.', options: ['go', 'goes', 'went', 'going'], answer: 2, why: '"Yesterday" (hôm qua) là thì quá khứ đơn: go → went.' },
+  { level: 'A2', q: 'This bag is ___ than that one.', options: ['heavy', 'heavier', 'heaviest', 'more heavy'], answer: 1, why: 'Có "than" là so sánh hơn; tính từ ngắn tận cùng -y: heavy → heavier.' },
+  { level: 'B1', q: 'I have lived here ___ 2015.', options: ['for', 'since', 'from', 'during'], answer: 1, why: '"since" + mốc thời gian (2015); "for" + khoảng thời gian (5 years).' },
+  { level: 'B1', q: 'If it rains tomorrow, we ___ at home.', options: ['stay', 'stayed', 'will stay', 'would stay'], answer: 2, why: 'Câu điều kiện loại 1: If + hiện tại đơn, will + động từ nguyên mẫu.' },
+  { level: 'B2', q: 'The report ___ by the manager before the meeting started.', options: ['had been checked', 'has checked', 'was checking', 'checks'], answer: 0, why: 'Việc kiểm tra xảy ra trước một việc khác trong quá khứ, ở thể bị động: had been + V3.' },
+  { level: 'B2', q: 'I wish I ___ more time to travel last year.', options: ['have', 'had', 'had had', 'would have'], answer: 2, why: 'Ước về quá khứ ("last year"): wish + quá khứ hoàn thành (had had).' },
+  { level: 'C1', q: '___ had I arrived than the phone started ringing.', options: ['Hardly', 'No sooner', 'Barely', 'Scarcely'], answer: 1, why: 'Cấu trúc đảo ngữ "No sooner had ... than ..." (vừa mới ... thì ...). Hardly/Barely/Scarcely đi với "when".' },
+  { level: 'C1', q: 'Chọn từ gần nghĩa nhất với "meticulous".', options: ['careless', 'thorough', 'generous', 'anxious'], answer: 1, why: '"meticulous" = tỉ mỉ, kỹ lưỡng, gần nghĩa nhất với "thorough".' },
+  { level: 'C2', q: 'His argument, though superficially persuasive, does not ___ scrutiny.', options: ['bear up to', 'stand up to', 'hold on to', 'put up with'], answer: 1, why: 'Cụm "stand up to scrutiny" = đứng vững trước sự xem xét kỹ lưỡng.' },
+  { level: 'C2', q: 'Chọn nghĩa đúng của "to pay lip service to".', options: ['ủng hộ nhiệt tình', 'chỉ nói suông, không làm thật', 'trả tiền trước', 'phê phán gay gắt'], answer: 1, why: '"pay lip service to" = nói ủng hộ ngoài miệng nhưng không làm thật.' },
 ];
 
 // Mỗi bài theo 5 bước: warmup → intro (vocab + grammar) → practice → apply → review.

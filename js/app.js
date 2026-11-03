@@ -295,7 +295,7 @@ function viewOnboard() {
 
 function viewPlacement() {
   document.body.classList.add('no-tabs');
-  const correctByLevel = {};
+  const correctByLevel = {}, answers = []; // answers[i] = { k: lựa chọn (-1 = chưa biết), ok }
   let i = 0;
   const show = () => {
     const q = PLACEMENT[i];
@@ -307,22 +307,40 @@ function viewPlacement() {
         <h2>${esc(q.q)}</h2>
         ${q.options.map((o, k) => `<button class="option" data-k="${k}">${esc(o)}</button>`).join('')}
         <button class="option muted" data-k="-1">🤷 Tôi chưa biết</button>
+        <div id="pl-fb"></div>
       </div>`;
+    // Chọn xong: tô xanh đáp án đúng, tô đỏ lựa chọn sai, giải thích rồi mới sang câu tiếp.
     $$('.option').forEach(b => b.onclick = () => {
-      if (+b.dataset.k === q.answer) correctByLevel[q.level] = (correctByLevel[q.level] || 0) + 1;
-      i++;
-      if (i < PLACEMENT.length) show();
-      else {
-        // Cấp độ = cấp đầu tiên chưa trả lời đúng cả 2 câu.
-        const placed = LEVELS.find(l => (correctByLevel[l] || 0) < 2) || 'C2';
-        finishPlacement(placed, correctByLevel);
-      }
+      const k = +b.dataset.k, ok = k === q.answer;
+      if (ok) correctByLevel[q.level] = (correctByLevel[q.level] || 0) + 1;
+      answers.push({ k, ok });
+      $$('.option').forEach(o => {
+        o.disabled = true;
+        if (+o.dataset.k === q.answer) o.classList.add('correct');
+        else if (o === b) o.classList.add('wrong');
+      });
+      const right = answers.filter(a => a.ok).length;
+      $('#pl-fb').innerHTML = `<div class="feedback ${ok ? 'ok' : 'bad'}">${ok ? '✅ Chính xác!' : k < 0 ? `🤷 Không sao! Đáp án đúng: <b>${esc(q.options[q.answer])}</b>` : `❌ Chưa đúng. Đáp án đúng: <b>${esc(q.options[q.answer])}</b>`}
+          ${q.why ? `<div class="small" style="font-weight:600;margin-top:4px">💡 ${esc(q.why)}</div>` : ''}</div>
+        <p class="muted small" style="text-align:center;margin:8px 0">✅ ${right} đúng · ❌ ${answers.length - right} chưa đúng</p>
+        <button class="btn block" id="pl-next">${i + 1 < PLACEMENT.length ? 'Câu tiếp theo →' : '🎯 Xem kết quả'}</button>`;
+      if (ok) playCorrect();
+      $('#pl-next').focus();
+      $('#pl-next').onclick = () => {
+        i++;
+        if (i < PLACEMENT.length) show();
+        else {
+          // Cấp độ = cấp đầu tiên chưa trả lời đúng cả 2 câu.
+          const placed = LEVELS.find(l => (correctByLevel[l] || 0) < 2) || 'C2';
+          finishPlacement(placed, correctByLevel, answers);
+        }
+      };
     });
   };
   show();
 }
 
-function finishPlacement(level, correctByLevel) {
+function finishPlacement(level, correctByLevel, answers = []) {
   state.profile.level = level;
   state.profile.onboarded = true;
   state.passedLevels = LEVELS.slice(0, levelIdx(level));
@@ -337,7 +355,16 @@ function finishPlacement(level, correctByLevel) {
       <h2>${LEVEL_INFO[level].name}</h2>
       <p>Lộ trình của bạn bắt đầu từ cấp ${level}. Các cấp thấp hơn vẫn mở để bạn ôn lại bất cứ lúc nào.</p>
       <button class="btn white" onclick="location.hash='#/home'">Bắt đầu học 🚀</button>
-    </div>`;
+    </div>
+    ${answers.length ? `<h2>📋 Xem lại bài kiểm tra</h2>
+    <div class="card">${PLACEMENT.map((q, n) => {
+      const a = answers[n];
+      return `<div class="post"><div class="spread"><b class="small">Câu ${n + 1} · ${q.level}</b><span>${a.ok ? '✅' : a.k < 0 ? '🤷' : '❌'}</span></div>
+        <div>${esc(q.q)}</div>
+        <div class="small">${a.ok ? `Bạn chọn đúng: <b style="color:var(--ok)">${esc(q.options[q.answer])}</b>`
+          : `${a.k < 0 ? 'Bạn chọn "Tôi chưa biết"' : `Bạn chọn: <s style="color:var(--bad)">${esc(q.options[a.k])}</s>`} · Đúng: <b style="color:var(--ok)">${esc(q.options[q.answer])}</b>`}</div>
+        ${q.why ? `<div class="muted small">💡 ${esc(q.why)}</div>` : ''}</div>`;
+    }).join('')}</div>` : ''}`;
 }
 
 // ================= Trang chủ =================
