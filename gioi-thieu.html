@@ -213,13 +213,13 @@
       <div class="glow g1"></div><div class="glow g2"></div>
       <div class="stage-bar">
         <button class="btn-open sm" id="dual-btn" aria-pressed="false">📱📱 Hai máy song song</button>
-        <label class="pick">Máy 1 <select id="pick-1" aria-label="Giao diện máy 1"><option value="app.html?theme=dark#/home">📱 App chuẩn</option><option value="demo03.html?theme=dark">🔐 Demo 03 · Đăng nhập</option><option value="demo02.html">✨ Demo 02</option><option value="ai-tutor.html">🤖 Gia sư AI</option></select></label>
+        <label class="pick">Máy 1 <select id="pick-1" aria-label="Giao diện máy 1"><option value="demo02.html">✨ Demo 02</option><option value="app.html?theme=dark#/home">📱 App chuẩn</option><option value="demo03.html?theme=dark">🔐 Demo 03 · Đăng nhập</option><option value="ai-tutor.html">🤖 Gia sư AI</option></select></label>
         <label class="pick" id="pick-2-wrap" hidden>Máy 2 <select id="pick-2" aria-label="Giao diện máy 2"><option value="app.html?theme=dark#/home">📱 App chuẩn</option><option value="demo03.html?theme=dark">🔐 Demo 03 · Đăng nhập</option><option value="demo02.html">✨ Demo 02</option><option value="ai-tutor.html">🤖 Gia sư AI</option></select></label>
       </div>
       <div class="phones">
         <div class="phone">
           <div class="status"><b class="clock">9:41</b><div class="island"><i></i></div><span>📶 🔋</span></div>
-          <div class="screen"><iframe id="app" title="Ứng dụng EngMate (máy 1)" src="app.html?theme=dark#/home" allow="microphone; autoplay"></iframe></div>
+          <div class="screen"><iframe id="app" title="Ứng dụng EngMate (máy 1)" allow="microphone; autoplay"></iframe></div>
           <div class="home-bar"><i></i></div>
         </div>
         <div class="phone" id="phone-2" hidden>
@@ -228,7 +228,7 @@
           <div class="home-bar"><i></i></div>
         </div>
       </div>
-      <p class="dual-note">Khung trống? <a href="app.html" id="open-1" target="_blank" rel="noopener">Mở app trong tab mới ↗</a></p>
+      <p class="dual-note">Khung trống? <a href="demo02.html" id="open-1" target="_blank" rel="noopener">Mở app trong tab mới ↗</a></p>
       <p class="dual-note" id="dual-note" hidden>Hai máy dùng chung dữ liệu học: XP, từ vựng, tiến độ đổi ở máy này sẽ hiện ở máy kia.</p>
     </section>
   </main>
@@ -246,11 +246,26 @@
       tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
       descs.forEach(d => { d.hidden = d.dataset.desc !== tab; });
     };
-    const navigate = hash => {
-      try { frame.contentWindow.location.hash = hash; } catch { frame.src = 'app.html?theme=dark' + hash; }
+    const pick1 = document.getElementById('pick-1');
+    // Máy 1: mặc định Demo 02, nhớ lựa chọn lần trước.
+    let src1 = '';
+    const setFrame1 = src => {
+      src1 = src; frame.src = src; document.getElementById('open-1').href = src;
+      const opt = [...pick1.options].find(o => o.value.split('#')[0] === src.split('#')[0]);
+      if (opt) pick1.value = opt.value;
+      try { localStorage.setItem('engmate-frame1', opt ? opt.value : src); } catch { /* bỏ qua */ }
     };
-    tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); if (t.dataset.src) frame.src = t.dataset.src; else navigate(t.dataset.route || '#/' + t.dataset.tab); });
-    document.querySelectorAll('.shortcuts [data-src]').forEach(b => b.onclick = () => { frame.src = b.dataset.src; });
+    let saved1 = 'demo02.html';
+    try { saved1 = localStorage.getItem('engmate-frame1') || saved1; } catch { /* bỏ qua */ }
+    if (![...pick1.options].some(o => o.value === saved1)) saved1 = 'demo02.html';
+    setFrame1(saved1);
+    // Các tab bên trái mở màn hình của app chuẩn: nếu máy 1 đang chạy giao diện khác thì chuyển về app chuẩn.
+    const navigate = hash => {
+      if (!src1.startsWith('app.html')) return setFrame1('app.html?theme=dark' + hash);
+      try { frame.contentWindow.location.hash = hash; } catch { setFrame1('app.html?theme=dark' + hash); }
+    };
+    tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); if (t.dataset.src) setFrame1(t.dataset.src); else navigate(t.dataset.route || '#/' + t.dataset.tab); });
+    document.querySelectorAll('.shortcuts [data-src]').forEach(b => b.onclick = () => setFrame1(b.dataset.src));
     document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => navigate(b.dataset.go));
 
       // Đồng bộ tab bên trái khi người dùng bấm trong điện thoại.
@@ -279,7 +294,7 @@
     };
     document.getElementById('pick-2').value = 'demo03.html?theme=dark';
     document.getElementById('dual-btn').onclick = () => setDual(!document.body.classList.contains('dual'));
-    document.getElementById('pick-1').onchange = e => { frame.src = e.target.value; document.getElementById('open-1').href = e.target.value; };
+    pick1.onchange = e => setFrame1(e.target.value);
     document.getElementById('pick-2').onchange = e => { frame2.src = e.target.value; };
     if (new URLSearchParams(location.search).has('dual')) setDual(true);
 
