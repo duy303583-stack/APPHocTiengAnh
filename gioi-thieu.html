@@ -7,10 +7,6 @@
   <title>EngMate – Học tiếng Anh thông minh cùng AI</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <script>
-    // Màn hình hẹp (điện thoại): vào thẳng ứng dụng.
-    if (window.innerWidth < 1024) location.replace('app.html' + location.hash);
-  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -46,7 +42,7 @@
     .grad { background: linear-gradient(90deg, var(--brand), var(--emerald), var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lead { color: var(--muted); line-height: 1.7; margin: 0 0 22px; }
 
-    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 6px; background: rgba(30, 41, 59, .8); border: 1px solid var(--line2); border-radius: 18px; }
+    .tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; padding: 6px; background: rgba(30, 41, 59, .8); border: 1px solid var(--line2); border-radius: 18px; }
     .tab {
       display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px; border: none; border-radius: 12px;
       background: transparent; color: var(--muted); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: .2s;
@@ -63,6 +59,13 @@
     .chips span { font-size: 11px; padding: 4px 10px; border-radius: 6px; background: rgba(51, 65, 85, .6); color: #cbd5e1; }
     .c-brand h3 { color: var(--brand); } .c-purple h3 { color: var(--purple); } .c-purple .chips span { background: rgba(167, 139, 250, .2); color: #ddd6fe; }
     .c-sky h3 { color: var(--sky); } .c-sky .chips span { background: rgba(56, 189, 248, .2); color: #bae6fd; }
+    .c-rose h3 { color: #fb7185; }
+    .tab.tab-new:not(.active) span { animation: ping 1.6s infinite; }
+    .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .feat-grid button { text-align: left; font: inherit; color: var(--text); background: rgba(51, 65, 85, .5); border: 1px solid var(--line2); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+    .feat-grid button:hover { border-color: #fb7185; }
+    .feat-grid b { display: block; font-size: 13px; } .feat-grid small { display: block; margin-top: 2px; font-size: 11px; line-height: 1.5; color: var(--muted); }
+    @media (max-width: 520px) { .feat-grid { grid-template-columns: 1fr; } }
     .c-amber h3 { color: var(--amber); } .c-amber .chips span { background: rgba(251, 191, 36, .2); color: #fde68a; }
     .shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .shortcuts button { font: inherit; font-size: 12px; font-weight: 700; color: var(--text); background: rgba(51, 65, 85, .6); border: 1px solid var(--line2); border-radius: 10px; padding: 6px 10px; cursor: pointer; }
@@ -70,7 +73,15 @@
     .foot-badges { display: flex; justify-content: space-between; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
 
     /* Khung điện thoại */
-    .stage { position: relative; display: flex; justify-content: center; }
+    .stage { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .stage-bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; }
+    .stage-bar .pick { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
+    .stage-bar select { font: inherit; font-size: 12px; color: var(--text); background: rgba(30, 41, 59, .9); border: 1px solid var(--line2); border-radius: 10px; padding: 6px 8px; }
+    .btn-open[aria-pressed="true"] { background: #fb7185; box-shadow: 0 8px 20px rgba(251, 113, 133, .3); }
+    .phones { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+    .dual-note { margin: 0; font-size: 12px; color: var(--muted); text-align: center; max-width: 520px; }
+    body.dual main { grid-template-columns: minmax(0, 1fr) auto; }
+    body.dual .phone { width: 330px; }
     .glow { position: absolute; border-radius: 50%; filter: blur(64px); z-index: -1; }
     .glow.g1 { width: 300px; height: 300px; background: rgba(34, 197, 94, .2); top: 50%; transform: translateY(-50%); }
     .glow.g2 { width: 240px; height: 240px; background: rgba(139, 92, 246, .2); top: 15%; }
@@ -100,7 +111,22 @@
     footer { text-align: center; font-size: 12px; color: #64748b; padding: 16px; border-top: 1px solid rgba(30, 41, 59, .6); }
     footer a { color: var(--muted); }
     @media (max-width: 1180px) { h2 { font-size: 38px; } }
+    /* Chừa chỗ cho nút "↩ Giao diện chuẩn" ở góc phải */
+    @media (min-width: 521px) { header { padding-right: 190px; } }
+    /* Màn hình hẹp: xếp một cột, điện thoại nằm dưới phần giới thiệu */
+    @media (max-width: 1023px) {
+      main { grid-template-columns: 1fr; gap: 28px; padding-top: 24px; }
+      header { flex-wrap: wrap; gap: 10px; }
+      .head-right { flex-wrap: wrap; gap: 8px; }
+      .fire, .head-right > span:not(.fire) { display: none; }
+      h2 { font-size: 30px; }
+      .tabs { grid-template-columns: repeat(2, 1fr); }
+      .foot-badges { flex-wrap: wrap; }
+      .phone { width: min(380px, 100%); height: 720px; min-height: 0; }
+    }
+    @media (max-width: 520px) { .wrap { padding: 0 16px; } header { padding: 12px 16px; } }
   </style>
+  <script src="js/demo-switcher.js" defer></script>
 </head>
 <body>
   <header>
@@ -130,6 +156,8 @@
         <button class="tab" data-tab="chat"><span>🤖</span>2. Gia sư AI</button>
         <button class="tab" data-tab="review"><span>🧠</span>3. Bài tập SRS</button>
         <button class="tab" data-tab="profile"><span>🏆</span>4. Gamification</button>
+        <button class="tab tab-new" data-tab="new" data-route="#/ailab/listen"><span>🆕</span>5. Tính năng mới</button>
+        <button class="tab tab-new" data-tab="login" data-src="demo03.html?theme=dark"><span>🔐</span>6. Demo 03</button>
       </div>
 
       <div class="desc c-brand" data-desc="home">
@@ -157,20 +185,53 @@
         <div class="shortcuts"><button data-go="#/battle">⚔️ Vào Đấu trường</button><button data-go="#/community">👥 Cộng đồng</button></div>
       </div>
 
+      <div class="desc c-rose" data-desc="new" hidden>
+        <h3>🆕 6 tính năng mới: Nghe, đọc & phiên dịch</h3>
+        <p>Học nghe – nói như có trợ lý riêng: app <b>đọc to văn bản</b>, chỉ cách phát âm <b>từ mới</b>, tạo <b>kịch bản đọc</b> không giới hạn và <b>phiên dịch giọng nói</b> để bạn trò chuyện trực tiếp với người nước ngoài.</p>
+        <div class="feat-grid">
+          <button data-go="#/ailab/listen"><b>🎧 Đọc to văn bản & PDF</b><small>Tiếng Anh, tiếng Việt · tô sáng câu đang đọc · chỉnh tốc độ</small></button>
+          <button data-go="#/ailab/listen"><b>🔤 Hướng dẫn phát âm</b><small>Tự đánh dấu từ mới · IPA · đánh vần · đọc chậm từng âm tiết</small></button>
+          <button data-go="#/ailab/listen"><b>🗞️ Kịch bản đọc mỗi ngày</b><small>Bấm bao nhiêu lần cũng được, mỗi lần một nội dung mới</small></button>
+          <button data-go="#/ailab/listen"><b>📒 Sổ tay từ vựng</b><small>Bôi đen để lưu · kèm phát âm · tự vào thẻ ôn tập</small></button>
+          <button data-go="#/ailab/interpret"><b>🗣️ Phiên dịch giọng nói</b><small>Việt ⇄ Anh, Trung, Nhật, Hàn, Pháp, Đức, Tây Ban Nha, Thái</small></button>
+          <button data-go="#/ailab/interpret"><b>📞 Hội thoại tự động</b><small>Hai bên nói lần lượt · hiện to câu dịch · câu mẫu offline</small></button>
+        </div>
+      </div>
+
+      <div class="desc c-purple" data-desc="login" hidden>
+        <h3>🔐 Demo 03: Đăng nhập → Trang chờ → Kiểm tra đầu vào → Vào học</h3>
+        <p>Điện thoại bên phải đang chạy <b>Demo 03</b>. Tạo tài khoản (hoặc đăng nhập), app chuyển sang <b>trang chờ</b> hiện bảng 8 bước kiểm tra trực quan (xanh ✔ đạt, đỏ ✖ lỗi kèm giải thích), rồi đưa người mới tới <b>bài kiểm tra đầu vào</b> A1–C2 trước khi vào Phân hệ Học tập.</p>
+        <div class="chips"><span>🔑 Băm PBKDF2-SHA-256 + salt</span><span>⛔ Khóa 60 giây sau 5 lần sai</span><span>🎫 Phiên đăng nhập có hạn</span><span>🧩 Kiểm tra toàn vẹn dữ liệu</span><span>🗣️ Tải trước bài học & giọng đọc</span><span>🎓 Kiểm tra quyền học</span></div>
+        <div class="shortcuts"><button data-src="demo03.html?theme=dark">↻ Chạy lại Demo 03</button><button data-src="app.html?theme=dark#/home">📱 Về app chuẩn</button></div>
+      </div>
+
       <div class="foot-badges"><span>📴 Học offline</span><span>🔔 Nhắc nhở thông minh</span><span>👥 Cộng đồng chia sẻ</span><span>📱 Cài như app</span></div>
     </section>
 
     <section class="stage">
       <div class="glow g1"></div><div class="glow g2"></div>
-      <div class="phone">
-        <div class="status"><b id="clock">9:41</b><div class="island"><i></i></div><span>📶 🔋</span></div>
-        <div class="screen"><iframe id="app" title="Ứng dụng EngMate" src="app.html?theme=dark#/home" allow="microphone; autoplay"></iframe></div>
-        <div class="home-bar"><i></i></div>
+      <div class="stage-bar">
+        <button class="btn-open sm" id="dual-btn" aria-pressed="false">📱📱 Hai máy song song</button>
+        <label class="pick">Máy 1 <select id="pick-1" aria-label="Giao diện máy 1"><option value="app.html?theme=dark#/home">📱 App chuẩn</option><option value="demo03.html?theme=dark">🔐 Demo 03 · Đăng nhập</option><option value="demo02.html">✨ Demo 02</option><option value="ai-tutor.html">🤖 Gia sư AI</option></select></label>
+        <label class="pick" id="pick-2-wrap" hidden>Máy 2 <select id="pick-2" aria-label="Giao diện máy 2"><option value="app.html?theme=dark#/home">📱 App chuẩn</option><option value="demo03.html?theme=dark">🔐 Demo 03 · Đăng nhập</option><option value="demo02.html">✨ Demo 02</option><option value="ai-tutor.html">🤖 Gia sư AI</option></select></label>
       </div>
+      <div class="phones">
+        <div class="phone">
+          <div class="status"><b class="clock">9:41</b><div class="island"><i></i></div><span>📶 🔋</span></div>
+          <div class="screen"><iframe id="app" title="Ứng dụng EngMate (máy 1)" src="app.html?theme=dark#/home" allow="microphone; autoplay"></iframe></div>
+          <div class="home-bar"><i></i></div>
+        </div>
+        <div class="phone" id="phone-2" hidden>
+          <div class="status"><b class="clock">9:41</b><div class="island"><i></i></div><span>📶 🔋</span></div>
+          <div class="screen"><iframe id="app-2" title="Ứng dụng EngMate (máy 2)" allow="microphone; autoplay"></iframe></div>
+          <div class="home-bar"><i></i></div>
+        </div>
+      </div>
+      <p class="dual-note" id="dual-note" hidden>Hai máy dùng chung dữ liệu học: XP, từ vựng, tiến độ đổi ở máy này sẽ hiện ở máy kia.</p>
     </section>
   </main>
 
-  <footer>EngMate © 2026 · <a href="app.html">Mở ứng dụng toàn màn hình</a> · <a href="ai-tutor.html">Gia sư AI</a> · <a href="demo02.html">Demo 02</a></footer>
+  <footer>EngMate © 2026 · <a href="app.html">Mở ứng dụng toàn màn hình</a> · <a href="ai-tutor.html">Gia sư AI</a> · <a href="demo01.html">Demo 01</a> · <a href="demo02.html">Demo 02</a> · <a href="demo03.html">Demo 03</a></footer>
 
   <script>
     const frame = document.getElementById('app');
@@ -186,7 +247,8 @@
     const navigate = hash => {
       try { frame.contentWindow.location.hash = hash; } catch { frame.src = 'app.html?theme=dark' + hash; }
     };
-    tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); navigate('#/' + t.dataset.tab); });
+    tabs.forEach(t => t.onclick = () => { highlight(t.dataset.tab); if (t.dataset.src) frame.src = t.dataset.src; else navigate(t.dataset.route || '#/' + t.dataset.tab); });
+    document.querySelectorAll('.shortcuts [data-src]').forEach(b => b.onclick = () => { frame.src = b.dataset.src; });
     document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => navigate(b.dataset.go));
 
       // Đồng bộ tab bên trái khi người dùng bấm trong điện thoại.
@@ -194,14 +256,32 @@
         try {
           const sync = () => {
             const route = frame.contentWindow.location.hash.replace(/^#\//, '').split('/')[0] || 'home';
-            if (TAB_OF[route]) highlight(TAB_OF[route]);
+            const tool = frame.contentWindow.location.hash.split('/')[2];
+            if (frame.contentWindow.REQUIRE_LOGIN && !frame.contentWindow.authed) highlight('login');
+            else if (route === 'ailab' && (tool === 'listen' || tool === 'interpret')) highlight('new');
+            else if (TAB_OF[route]) highlight(TAB_OF[route]);
           };
           frame.contentWindow.addEventListener('hashchange', sync);
           sync();
         } catch { /* mở bằng file:// thì khung bị chặn truy cập: các tab bên trái vẫn hoạt động */ }
       });
 
-    const tick = () => { const d = new Date(); document.getElementById('clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    // Hai máy song song: máy 2 chạy giao diện khác (mặc định Demo 03), dùng chung dữ liệu học với máy 1.
+    const frame2 = document.getElementById('app-2');
+    const setDual = on => {
+      document.body.classList.toggle('dual', on);
+      document.getElementById('dual-btn').setAttribute('aria-pressed', on);
+      document.getElementById('dual-btn').textContent = on ? '📱 Một máy' : '📱📱 Hai máy song song';
+      document.getElementById('phone-2').hidden = document.getElementById('pick-2-wrap').hidden = document.getElementById('dual-note').hidden = !on;
+      if (on && !frame2.getAttribute('src')) frame2.src = document.getElementById('pick-2').value;
+    };
+    document.getElementById('pick-2').value = 'demo03.html?theme=dark';
+    document.getElementById('dual-btn').onclick = () => setDual(!document.body.classList.contains('dual'));
+    document.getElementById('pick-1').onchange = e => { frame.src = e.target.value; };
+    document.getElementById('pick-2').onchange = e => { frame2.src = e.target.value; };
+    if (new URLSearchParams(location.search).has('dual')) setDual(true);
+
+    const tick = () => { const d = new Date(); document.querySelectorAll('.clock').forEach(c => { c.textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; }); };
     tick(); setInterval(tick, 30000);
   </script>
 </body>
