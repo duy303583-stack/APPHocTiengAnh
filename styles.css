@@ -311,3 +311,17 @@ label { display: block; font-weight: 800; margin: 12px 0 6px; }
 .fc-battle .feature-icon { background: #fff3e0; color: #f57c00; }
 .topic-filter { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .xp-flash { color: var(--primary); font-weight: 800; }
+
+/* ---------- Nghe & đọc ---------- */
+.fc-listen .feature-icon { background: #e0f2fe; color: #0284c7; }
+.read-text { font-size: 1.08rem; line-height: 1.95; margin-top: 8px; white-space: pre-wrap; }
+.read-text .sent { border-radius: 6px; padding: 1px 0; transition: background .2s; cursor: pointer; }
+.read-text .sent.reading { background: rgba(253, 224, 71, .45); }
+.read-text .w { border-radius: 4px; }
+.read-text .w:hover { background: var(--primary-soft); }
+.w.new { border-bottom: 2px dotted var(--accent); }
+.w.saved { background: var(--primary-soft); color: var(--primary); }
+.selbar { position: sticky; bottom: 76px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; padding: 10px; border-radius: 14px; background: var(--primary-soft); }
+.selbar input { flex: 1; min-width: 120px; padding: 7px 10px; }
+.word-card { border: 2px solid var(--primary-soft); }
+details.card summary { cursor: pointer; }

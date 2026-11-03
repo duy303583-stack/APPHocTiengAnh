@@ -36,6 +36,7 @@ Không có API key thì mọi thứ vẫn chạy, chỉ các tính năng AI bị
 | `ai-tutor.html` | Giao diện gọn "Gia sư AI" (tông tím): chat nhập vai + trợ lý viết, dùng chung AI và XP với app |
 | `js/app.js` | Toàn bộ màn hình và logic: lộ trình, bài học 5 bước, SRS, gamification… |
 | `js/data.js` | Nội dung: bài kiểm tra đầu vào, 12 bài học A1–C2, huy hiệu, nhân vật AI |
+| `js/listen.js` | 🎧 Nghe & đọc: đọc to văn bản/PDF (Anh, Việt), đánh dấu từ mới kèm IPA, đọc chậm, tách âm tiết, kịch bản đọc mỗi ngày, sổ tay từ |
 | `js/ai.js` | Giọng nói (đọc/nghe), chấm phát âm, gọi Claude |
 | `js/prompts.js` | Prompt AI dùng chung cho cả JavaScript và Python |
 | `sw.js`, `manifest.json` | Học offline, cài như app (PWA) |

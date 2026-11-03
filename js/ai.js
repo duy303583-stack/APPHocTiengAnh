@@ -4,15 +4,15 @@ const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.65.0/+esm';
 const MODEL = 'claude-opus-5-5';
 
 // ---------- Text-to-speech ----------
-// onEnd được gọi khi đọc xong (dùng cho chế độ gọi điện).
-function speak(text, rate = 0.95, onEnd) {
+// onEnd được gọi khi đọc xong (dùng cho chế độ gọi điện). lang: 'en-US' hoặc 'vi-VN'.
+function speak(text, rate = 0.95, onEnd, lang = 'en-US') {
   if (!('speechSynthesis' in window)) { onEnd?.(); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
+  u.lang = lang;
   u.rate = rate;
-  const voices = speechSynthesis.getVoices();
-  const voice = voices.find(v => v.lang.startsWith('en-US')) || voices.find(v => v.lang.startsWith('en'));
+  const voices = speechSynthesis.getVoices(), base = lang.slice(0, 2);
+  const voice = voices.find(v => v.lang.replace('_', '-').startsWith(lang)) || voices.find(v => v.lang.startsWith(base));
   if (voice) u.voice = voice;
   if (onEnd) { u.onend = () => onEnd(); u.onerror = () => onEnd(); }
   speechSynthesis.speak(u);

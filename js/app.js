@@ -35,7 +35,7 @@ const DEFAULT_STATE = {
   posts: [],
   weak: {}, recentMistakes: [],
   battles: { played: 0, wins: 0 }, tutorAvatar: '🦉', aiLabUses: 0,
-  pronounce: {},
+  pronounce: {}, ipa: {}, scripts: null,
 };
 
 let state = load();
@@ -375,6 +375,7 @@ function viewHome() {
       ${feature('fc-srs', '#/review', 'fa-brain', 'Ôn tập SRS', due ? `${due} từ cần ôn hôm nay` : 'Ghi nhớ từ vựng')}
       ${feature('fc-pronun', '#/ailab/dict', 'fa-microphone-lines', 'Phát âm', 'Chấm điểm giọng')}
       ${feature('fc-grammar', '#/ailab/write', 'fa-spell-check', 'Ngữ pháp', 'Sửa lỗi thông minh')}
+      ${feature('fc-listen', '#/ailab/listen', 'fa-headphones', 'Nghe & đọc', 'Đọc to, từ mới, kịch bản')}
       ${feature('fc-lab', '#/ailab/analyze', 'fa-wand-magic-sparkles', 'Học cùng AI', 'Dịch, truyện, điểm yếu')}
       ${feature('fc-battle', '#/battle', 'fa-shield-halved', 'Đấu trường AI', `${state.battles.wins} trận thắng`)}
     </div>
@@ -967,6 +968,7 @@ function runQuiz(el, questions, onEach, onDone) {
 }
 
 const AI_TOOLS = [
+  { id: 'listen', icon: '🎧', name: 'Nghe & đọc' },
   { id: 'write', icon: '✍️', name: 'Trợ lý viết' },
   { id: 'translate', icon: '🌐', name: 'Dịch ngữ cảnh' },
   { id: 'story', icon: '📚', name: 'Truyện AI' },
@@ -980,7 +982,7 @@ function viewAILab(tool = 'write') {
   const ready = aiReady();
   const level = state.profile.level;
   view.innerHTML = `<h1>✨ Học cùng AI</h1>
-    ${ready ? '' : `<div class="banner">🔑 Các công cụ AI cần API key trong <a href="#/settings">Cài đặt</a> hoặc chạy máy chủ Python có ANTHROPIC_API_KEY.</div>`}
+    ${ready || tool === 'listen' ? '' : `<div class="banner">🔑 Các công cụ AI cần API key trong <a href="#/settings">Cài đặt</a> hoặc chạy máy chủ Python có ANTHROPIC_API_KEY.</div>`}
     <div class="utils">${AI_TOOLS.map(t => `<a class="btn sm ${t.id === tool ? '' : 'ghost'}" style="flex:none" href="#/ailab/${t.id}">${t.icon} ${t.name}</a>`).join('')}</div>
     <div class="card" id="tool" style="margin-top:8px"></div><div id="out"></div>`;
   const box = $('#tool'), out = $('#out');
@@ -1003,7 +1005,9 @@ function viewAILab(tool = 'write') {
     btn.textContent = label;
   };
 
-  if (tool === 'write') {
+  if (tool === 'listen') listenTool(box, out, ready, level, run);
+
+  else if (tool === 'write') {
     box.innerHTML = `<b>✍️ Trợ lý viết & sửa ngữ pháp</b>
       <p class="muted small">Viết một đoạn tiếng Anh: AI sửa lỗi, giải thích vì sao bằng tiếng Việt và gợi ý từ vựng hay hơn.</p>
       <input id="w-task" placeholder="Chủ đề / đề bài (không bắt buộc)">

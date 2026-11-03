@@ -328,6 +328,59 @@ const EM_PROMPTS = {
         "additionalProperties": false
       }
     },
+    "script": {
+      "system": "You write short graded reading scripts for Vietnamese learners of English who will read them aloud. Every script must be new: vary the topic, characters, setting and sentence patterns. Use natural, grammatical English at the requested CEFR level.",
+      "user": "Learner level: {level}\nTopic idea (may be empty, then pick a fresh everyday topic yourself): {input}\nWords the learner is studying (use 2–4 of them naturally if any): {words}\nVariety seed: {extra}\n\nWrite a reading-aloud script of 80–140 words (a short story, news item, dialogue or diary entry). Give a title, the script, a natural Vietnamese translation, and 4–6 words from the script that are new or hard for this level, each with American IPA, Vietnamese meaning and a short Vietnamese tip on how to say it.",
+      "max_tokens": 3000,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "translation_vi": {
+            "type": "string"
+          },
+          "words": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string"
+                },
+                "ipa": {
+                  "type": "string"
+                },
+                "vi": {
+                  "type": "string"
+                },
+                "tip_vi": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "en",
+                "ipa",
+                "vi",
+                "tip_vi"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "title",
+          "text",
+          "translation_vi",
+          "words"
+        ],
+        "additionalProperties": false
+      }
+    },
     "dict": {
       "system": "You are a concise English–Vietnamese learner's dictionary.",
       "user": "Learner level: {level}\nLook up: {input}\n\nGive the headword (corrected if misspelled), American IPA, part of speech, 1–3 common meanings (Vietnamese meaning + simple English definition), 2 example sentences at the learner's level with Vietnamese translations, up to 4 synonyms, and one Vietnamese tip on how to pronounce it (stress, ending sounds, sounds Vietnamese speakers often get wrong).",
