@@ -39,6 +39,7 @@ Không có API key thì mọi thứ vẫn chạy, chỉ các tính năng AI bị
 | `js/data.js` | Nội dung: bài kiểm tra đầu vào, 12 bài học A1–C2, huy hiệu, nhân vật AI |
 | `js/listen.js` | 🎧 Nghe & đọc: đọc to văn bản/PDF (Anh, Việt), đánh dấu từ mới kèm IPA, đọc chậm, tách âm tiết, kịch bản đọc mỗi ngày, sổ tay từ |
 | `js/interpret.js` | 🗣️ Phiên dịch giọng nói: nói tiếng Việt ⇄ 8 ngôn ngữ (Anh, Trung, Nhật, Hàn, Pháp, Đức, Tây Ban Nha, Thái), dịch theo ngữ cảnh và lĩnh vực, hội thoại tự động, hiện to câu dịch, câu mẫu offline |
+| `js/game.js` | 🎮 Trung tâm Gamification: Chạm trán AI (3 mini-game × 3 độ khó, đá quý, trang phục hiếm), Đấu 60 giây (đối thủ mô phỏng, 2 người cùng máy, thách đấu bạn bè qua link), đường đua chuỗi ngày + rương + thẻ hồi sinh, giải đấu 6 hạng (30 người, thăng/rớt hạng), nhiệm vụ ngày/tuần/sự kiện mùa, cửa hàng (trang phục, giọng, danh hiệu, khung, âm thanh), bang hội & Boss tuần |
 | `js/ai.js` | Giọng nói (đọc/nghe), chấm phát âm, gọi Claude |
 | `js/prompts.js` | Prompt AI dùng chung cho cả JavaScript và Python |
 | `sw.js`, `manifest.json` | Học offline, cài như app (PWA) |

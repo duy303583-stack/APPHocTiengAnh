@@ -11,6 +11,7 @@ function speak(text, rate = 0.95, onEnd, lang = 'en-US') {
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lang;
   u.rate = rate;
+  u.pitch = window.EM_PITCH || 1; // giọng gia sư mua trong Cửa hàng (js/game.js)
   const voices = speechSynthesis.getVoices(), base = lang.slice(0, 2);
   const voice = voices.find(v => v.lang.replace('_', '-').startsWith(lang)) || voices.find(v => v.lang.startsWith(base));
   if (voice) u.voice = voice;

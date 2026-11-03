@@ -101,10 +101,12 @@ const say = text => speak(text, ttsRate());
 
 // ================= Gamification =================
 function currentStreak() {
-  return state.lastDay === today() || state.lastDay === daysAgo(1) ? state.streak : 0;
+  // Lỡ đúng 1 ngày mà còn Thẻ hồi sinh thì chuỗi vẫn được giữ (thẻ dùng khi học lại).
+  return state.lastDay === today() || state.lastDay === daysAgo(1) || (state.lastDay === daysAgo(2) && state.freezes > 0) ? state.streak : 0;
 }
 function touchStreak() {
   if (state.lastDay === today()) return;
+  useStreakFreeze();
   state.streak = state.lastDay === daysAgo(1) ? state.streak + 1 : 1;
   state.lastDay = today();
 }
@@ -114,8 +116,10 @@ const QUEST_DEFS = [
   { id: 'lesson', icon: '📘', label: 'Hoàn thành 1 bài học', target: 1 },
   { id: 'review', icon: '🧠', label: 'Ôn 10 thẻ từ vựng', target: 10 },
   { id: 'chat', icon: '🤖', label: 'Gửi 3 tin nhắn cho gia sư AI', target: 3 },
+  { id: 'words', icon: '🆕', label: 'Học 5 từ mới', target: 5 },
+  { id: 'pron', icon: '🎤', label: 'Đạt ≥90% điểm phát âm', target: 1 },
 ];
-const QUEST_REWARD = 20;
+const QUEST_REWARD = 20, QUEST_GEMS = 5;
 
 function quests() {
   if (!state.quests || state.quests.date !== today()) {
@@ -130,8 +134,9 @@ function questProgress(id, amount) {
   q.progress[id] = (q.progress[id] || 0) + amount;
   if (q.progress[id] >= def.target) {
     q.done[id] = true;
+    state.gems = (state.gems || 0) + QUEST_GEMS;
     gainXP(QUEST_REWARD, false);
-    toast(`✅ Nhiệm vụ hoàn thành: ${def.label} (+${QUEST_REWARD} XP)`);
+    toast(`✅ Nhiệm vụ hoàn thành: ${def.label} (+${QUEST_REWARD} XP, +${QUEST_GEMS} 💎)`);
     if (QUEST_DEFS.every(d => q.done[d.id])) award('quests');
   }
 }
@@ -177,7 +182,7 @@ function smartNudge() {
   if (streak >= 2) return `Chuỗi ${streak} ngày học của bạn sắp bị đứt, cố lên ${name}! 🔥`;
   return `Chỉ ${state.profile.goal} phút hôm nay thôi, ${name}. Mình đợi bạn đó! 🦉`;
 }
-const unlockedAvatars = () => TUTOR_AVATARS.slice(0, 1 + state.battles.wins);
+const unlockedAvatars = () => [...TUTOR_AVATARS.slice(0, 1 + state.battles.wins), ...(state.owned?.outfit || [])];
 
 const AVATARS = Object.fromEntries(AGE_GROUPS.map(g => [g.id, g.icon]));
 function renderTop() {
@@ -189,13 +194,16 @@ function renderTop() {
   const gained = renderTop.lastXP !== undefined && state.xp > renderTop.lastXP;
   renderTop.lastXP = state.xp;
   $('#userLevel').innerHTML = `Cấp ${p.level} · 🔥 ${currentStreak()} ngày · <span class="${gained ? 'xp-flash' : ''}">⭐ ${state.xp} XP</span>`;
+  decorateTop(); // đá quý, danh hiệu, khung avatar (js/game.js)
 }
 
 // ================= Spaced repetition (SM-2) =================
 function addCards(vocab) {
+  let added = 0;
   for (const v of vocab) {
-    if (!state.srs[v.en]) state.srs[v.en] = { ...v, ef: 2.5, reps: 0, interval: 0, due: Date.now() };
+    if (!state.srs[v.en]) { state.srs[v.en] = { ...v, ef: 2.5, reps: 0, interval: 0, due: Date.now() }; added++; }
   }
+  if (added) { questProgress('words', added); gameOnNewWords(added); }
 }
 function gradeCard(card, q) {
   if (q < 3) {
@@ -228,7 +236,7 @@ const nextLesson = () => LESSONS.find(l => isUnlocked(l) && forMyAge(l) && !stat
 const routes = {
   onboard: viewOnboard, placement: viewPlacement, home: viewHome, path: viewPath, lesson: viewLesson,
   review: viewReview, chat: viewChat, profile: viewProfile, test: viewTest, cert: viewCert,
-  settings: viewSettings, community: viewCommunity, ailab: viewAILab, battle: viewBattle,
+  settings: viewSettings, community: viewCommunity, ailab: viewAILab, battle: () => viewGame('battle'), game: viewGame,
 };
 function router() {
   const [name, arg] = location.hash.replace(/^#\//, '').split('/');
@@ -385,9 +393,10 @@ function viewHome() {
     <div class="section-head"><h2>Trò chơi hóa &amp; Động lực</h2></div>
     <div class="gamification-row">
       <a class="game-card" href="#" id="g-quests"><div class="game-icon">📋</div><div class="game-title">Nhiệm vụ</div><div class="game-desc">${questsDone}/${QUEST_DEFS.length} hoàn thành</div></a>
-      <a class="game-card" href="#/profile"><div class="game-icon">🏆</div><div class="game-title">Xếp hạng</div><div class="game-desc">Hạng ${myRank} tuần này</div></a>
+      <a class="game-card" href="#/game/league"><div class="game-icon">🏆</div><div class="game-title">Giải đấu</div><div class="game-desc">Hạng ${myRank} tuần này</div></a>
       <a class="game-card" href="#/profile"><div class="game-icon">🎖️</div><div class="game-title">Huy hiệu</div><div class="game-desc">Đã đạt ${state.badges.length}/${BADGES.length}</div></a>
     </div>
+    <a class="card game-entry" href="#/game"><span class="ge-ico">🎮</span><span class="grow"><b>Trung tâm Gamification</b><span class="muted small">Chạm trán AI · Đấu 60 giây · Chuỗi lửa · Giải đấu · Cửa hàng 💎 · Bang hội & Boss</span></span><span>›</span></a>
 
     <div class="section-head" id="quests"><h2>🎯 Nhiệm vụ hằng ngày</h2></div>
     <div class="card">${questsHtml(q)}</div>
@@ -461,6 +470,7 @@ function viewPath(topicId) {
 // renderExercise gọi onResult(đúng/sai) một lần, rồi onContinue khi bấm "Tiếp tục".
 function renderExercise(el, ex, onResult, onContinue) {
   const finish = (ok, correctText) => {
+    if (ok) playCorrect();
     onResult(ok);
     el.insertAdjacentHTML('beforeend', `
       <div class="feedback ${ok ? 'ok' : 'bad'}">${ok ? '🎉 Chính xác!' : `😅 Chưa đúng. Đáp án: <b>${esc(correctText)}</b>`}</div>
@@ -1138,6 +1148,7 @@ function viewAILab(tool = 'write') {
           const { score, words } = pronunciationScore(w.en, said);
           const key = w.en.toLowerCase();
           state.pronounce[key] = Math.max(state.pronounce[key] || 0, score);
+          if (score >= 90) questProgress('pron', 1);
           if (score < 60) {
             // AI-SRS: phát âm chưa đạt → từ quay lại sớm trong ôn tập và được gia sư AI dùng trong chat.
             addCards([{ en: w.en, vi: w.vi || w.meanings?.[0]?.vi || '', ex: w.ex || w.examples?.[0]?.en || '' }]);
@@ -1292,7 +1303,11 @@ function weekDays() {
 }
 function seeded(str) { let h = 2166136261; for (const c of str) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return ((h >>> 0) % 1000) / 1000; }
 
+// Bảng xếp hạng tuần = giải đấu phân hạng (js/game.js).
 function leaderboard() {
+  return leagueBoard();
+}
+function leaderboardOld() {
   const days = weekDays();
   const elapsed = Math.max(1, days.filter(d => dayKey(d) <= today()).length);
   const weekKey = dayKey(days[0]);
@@ -1312,7 +1327,7 @@ function viewProfile() {
   const lessonsDone = Object.keys(state.completed).length;
 
   view.innerHTML = `
-    <div class="spread"><h1>🏆 Thành tích</h1><a class="btn ghost sm" href="#/settings">⚙️ Cài đặt</a></div>
+    <div class="spread"><h1>🏆 Thành tích</h1><span class="row"><a class="btn sm" href="#/game">🎮 Gamification</a><a class="btn ghost sm" href="#/settings">⚙️ Cài đặt</a></span></div>
     <div class="grid" style="grid-template-columns:repeat(4,1fr)">
       <div class="card" style="text-align:center"><div style="font-size:1.5rem">🔥</div><b>${currentStreak()}</b><div class="muted small">ngày liên tiếp</div></div>
       <div class="card" style="text-align:center"><div style="font-size:1.5rem">⭐</div><b>${state.xp}</b><div class="muted small">tổng XP</div></div>
@@ -1327,7 +1342,7 @@ function viewProfile() {
 
     <h2>🏅 Bảng xếp hạng tuần</h2>
     <div class="card">${board.map((r, i) => `<div class="board-row ${r.me ? 'me' : ''}"><span class="rank">${['🥇', '🥈', '🥉'][i] || i + 1}</span><span class="grow">${esc(r.name)}</span><span>${r.xp} XP</span></div>`).join('')}
-      <p class="muted small">Giải đấu tuần với người chơi mô phỏng, làm mới vào mỗi thứ Hai.</p></div>
+      <p class="muted small">${TIERS[state.league.tier][1]} Giải ${TIERS[state.league.tier][0]} · người chơi mô phỏng, chốt hạng mỗi thứ Hai. <a href="#/game/league">Xem giải đấu</a></p></div>
 
     <h2>🎖️ Huy hiệu (${state.badges.length}/${BADGES.length})</h2>
     <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr))">

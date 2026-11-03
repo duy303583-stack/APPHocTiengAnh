@@ -311,6 +311,7 @@ function listenTool(box, out, ready, level, run) {
         const said = await listenWithWave(wave);
         const { score } = pronunciationScore(k, said);
         state.pronounce[k] = Math.max(state.pronounce[k] || 0, score);
+        if (score >= 90) questProgress('pron', 1);
         gainXP(score >= 80 ? 3 : 1);
         $('#lw-res').innerHTML = `<div class="feedback ${score >= 80 ? 'ok' : 'bad'}">Điểm ${score}% · máy nghe được: "${esc(said)}"
           <div class="small" style="font-weight:600">${score >= 80 ? 'Chuẩn rồi! 🎉' : 'Nghe 🐢 đọc chậm hoặc 🧩 từng âm tiết rồi thử lại nhé.'}</div></div>`;
