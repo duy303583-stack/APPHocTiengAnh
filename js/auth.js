@@ -1,4 +1,4 @@
-// 🔐 Đăng nhập → Trang chờ (kiểm tra) → Kiểm tra đầu vào → Phân hệ học tập.
+// 🔐 Đăng nhập → Trang chờ (bảng kiểm tra trực quan xanh/đỏ) → Kiểm tra đầu vào → Phân hệ học tập.
 // Tài khoản lưu trên chính thiết bị: mật khẩu băm PBKDF2-SHA-256 có salt ngẫu nhiên, không lưu dạng chữ.
 // Sai 5 lần thì khóa 60 giây. Phiên đăng nhập là mã ngẫu nhiên, chỉ lưu bản băm để đối chiếu.
 // Script thường, nạp trước js/app.js.
@@ -80,11 +80,7 @@ function viewLogin(msg = '') {
     $('#au-meter').style.background = score < 2 ? 'var(--bad)' : score < 4 ? 'var(--accent)' : 'var(--ok)';
     $('#au-strength').textContent = v ? ['Rất yếu', 'Yếu', 'Trung bình', 'Khá', 'Mạnh', 'Rất mạnh'][score] : 'Độ mạnh mật khẩu';
   };
-  if (!isNew) $('#au-forgot').onclick = () => {
-    if (!confirm('Mật khẩu chỉ lưu dạng băm trên máy này nên không thể khôi phục. Xóa tài khoản để tạo lại? (Tiến độ học vẫn được giữ.)')) return;
-    localStorage.removeItem(AUTH_KEY); localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY);
-    viewLogin();
-  };
+  if (!isNew) $('#au-forgot').onclick = resetAccount;
 
   $('#au-form').onsubmit = e => {
     e.preventDefault();
@@ -97,94 +93,146 @@ function viewLogin(msg = '') {
   setTimeout(() => (isNew ? $('#au-user') : $('#au-pass')).focus(), 50);
 }
 
-// Trang chờ: chạy lần lượt các bước kiểm tra, bước nào lỗi thì dừng và quay lại màn đăng nhập.
+// Trang chờ kiểm tra trực quan: mỗi bước xám (chờ) → vàng (đang kiểm tra) → xanh ✔ (đạt) hoặc đỏ ✖ (lỗi),
+// kèm giải thích bên dưới. Chỉ khi mọi bước xanh mới mở Phân hệ Học tập; có bước đỏ thì giữ màn hình để đọc lỗi.
+function resetAccount() {
+  if (!confirm('Mật khẩu chỉ lưu dạng băm trên máy này nên không thể khôi phục. Xóa tài khoản để tạo lại? (Tiến độ học vẫn được giữ.)')) return;
+  localStorage.removeItem(AUTH_KEY); localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY);
+  viewLogin();
+}
+
 async function viewBoot({ user, pass, isNew, remember }) {
   document.body.classList.add('no-tabs');
-  const steps = [
-    ['🔑', 'Băm mật khẩu bằng PBKDF2-SHA-256'],
-    ['👤', 'Kiểm tra tài khoản (bị khóa? mật khẩu khớp?)'],
-    ['🎫', 'Tạo & xác thực phiên đăng nhập'],
-    ['🧩', 'Kiểm tra toàn vẹn dữ liệu học tập'],
-    ['🗣️', 'Tải trước bài học, giọng đọc & từ vựng'],
-    ['🎓', 'Kiểm tra quyền vào Phân hệ Học tập'],
-  ];
-  view.innerHTML = `<div class="auth-wrap"><div class="auth-logo spin">🦉</div>
-    <h1 style="text-align:center;margin-bottom:4px">Đang khởi động...</h1><p class="muted small" style="text-align:center;margin-top:0" id="bt-now">Chuẩn bị</p>
-    <div class="progress" style="margin:12px 0"><div id="bt-bar" style="width:0%"></div></div>
-    <div class="card">${steps.map(([i, t], k) => `<div class="boot-step" id="bt-${k}"><span class="bs-ico">${i}</span><span class="grow">${t}</span><span class="bs-st">⏳</span></div>`).join('')}</div></div>`;
-  const pause = ms => new Promise(r => setTimeout(r, ms));
-  const mark = (k, ok, note) => {
-    const el = $(`#bt-${k}`);
-    if (!el) return;
-    el.classList.add(ok ? 'ok' : 'fail');
-    $('.bs-st', el).textContent = ok ? '✅' : '❌';
-    if (note) $('.grow', el).insertAdjacentHTML('beforeend', `<div class="small muted">${esc(note)}</div>`);
-    $('#bt-bar').style.width = `${Math.round(100 * (k + 1) / steps.length)}%`;
-  };
-  const run = async (k, fn) => {
-    $('#bt-now').textContent = steps[k][1] + '...';
-    $(`#bt-${k}`)?.classList.add('doing');
-    const t0 = performance.now();
-    let res;
-    try { res = await fn(); } catch (e) { res = { ok: false, note: e.message }; }
-    await pause(Math.max(0, 380 - (performance.now() - t0))); // để kịp nhìn thấy từng bước
-    mark(k, res.ok, res.note);
-    if (!res.ok) throw new Error(res.msg || res.note);
-  };
-
   let a = loadAuth(), hash;
-  try {
-    await run(0, async () => {
+  // Mỗi bước: [biểu tượng, tên, câu khi đang chạy, hàm kiểm tra → { ok, note, fix? }]. fix: 'reset' hiện nút khôi phục tài khoản.
+  const steps = [
+    ['💾', 'Bộ nhớ thiết bị', 'Đang thử ghi và đọc dữ liệu trên máy...', async () => {
+      const k = 'engmate-probe', v = randHex(8);
+      localStorage.setItem(k, v);
+      const ok = localStorage.getItem(k) === v;
+      localStorage.removeItem(k);
+      return ok ? { ok, note: 'Ghi/đọc dữ liệu trên máy thành công.' }
+        : { ok, note: 'Lỗi: trình duyệt không lưu được dữ liệu. Hãy tắt chế độ ẩn danh hoặc cho phép lưu trữ.' };
+    }],
+    ['🔑', 'Băm mật khẩu (PBKDF2-SHA-256)', `Đang băm mật khẩu ${PBKDF2_ITER.toLocaleString('vi-VN')} vòng...`, async () => {
       const salt = isNew ? randHex(16) : a.salt;
       hash = await hashPassword(pass, salt, isNew ? PBKDF2_ITER : a.iter);
       if (isNew) a = { user, salt, iter: PBKDF2_ITER, hash, role: 'learner', created: Date.now(), fails: 0, lockedUntil: 0 };
-      return { ok: true, note: `${(isNew ? PBKDF2_ITER : a.iter).toLocaleString('vi-VN')} vòng băm` };
-    });
-    await run(1, async () => {
+      return { ok: true, note: `Đã băm ${(isNew ? PBKDF2_ITER : a.iter).toLocaleString('vi-VN')} vòng kèm salt ngẫu nhiên. Mật khẩu không được lưu dạng chữ.` };
+    }],
+    ['👤', 'Xác thực tài khoản', 'Đang đối chiếu với tài khoản đã lưu...', async () => {
       if (!isNew && Date.now() < (a.lockedUntil || 0)) {
         const s = Math.ceil((a.lockedUntil - Date.now()) / 1000);
-        return { ok: false, note: `Tài khoản tạm khóa, thử lại sau ${s} giây.` };
+        return { ok: false, note: `Lỗi: tài khoản đang tạm khóa do nhập sai nhiều lần. Thử lại sau ${s} giây.`, fix: 'reset' };
       }
       if (!isNew && !sameHex(hash, a.hash)) {
         a.fails = (a.fails || 0) + 1;
         if (a.fails >= MAX_FAILS) { a.lockedUntil = Date.now() + LOCK_MS; a.fails = 0; }
         saveAuth(a);
         const left = a.lockedUntil > Date.now() ? 0 : MAX_FAILS - a.fails;
-        return { ok: false, note: left ? `Sai mật khẩu, còn ${left} lần thử.` : 'Sai quá 5 lần: tài khoản bị khóa 60 giây.' };
+        return { ok: false, fix: 'reset', note: left ? `Lỗi: mật khẩu không khớp. Còn ${left} lần thử trước khi tài khoản bị khóa 60 giây.` : 'Lỗi: sai mật khẩu 5 lần, tài khoản bị khóa 60 giây.' };
       }
       a.fails = 0; a.lockedUntil = 0; a.lastLogin = Date.now();
-      return { ok: true, note: isNew ? 'Đã tạo tài khoản mới' : 'Mật khẩu khớp' };
-    });
-    await run(2, async () => {
+      return { ok: true, note: isNew ? `Đã tạo tài khoản “${a.user}”.` : 'Mật khẩu khớp với tài khoản đã lưu.' };
+    }],
+    ['🎫', 'Phiên đăng nhập', 'Đang tạo mã phiên và xác thực...', async () => {
       const token = randHex(32), exp = Date.now() + (remember ? SESSION_MS.remember : SESSION_MS.short);
       a.session = { tokenHash: await sha256(token), exp };
       saveAuth(a);
       sessionStorage.setItem(SESSION_KEY, JSON.stringify({ user: a.user, token }));
       if (remember) localStorage.setItem(SESSION_KEY, JSON.stringify({ user: a.user, token })); else localStorage.removeItem(SESSION_KEY);
       const ok = await validateSession();
-      return { ok, note: ok ? `Hết hạn ${new Date(exp).toLocaleString('vi-VN')}` : 'Phiên không hợp lệ' };
-    });
-    await run(3, async () => {
+      return ok ? { ok, note: `Mã phiên hợp lệ, hết hạn ${new Date(exp).toLocaleString('vi-VN')}.` }
+        : { ok, note: 'Lỗi: mã phiên không khớp sau khi tạo. Hãy thử đăng nhập lại.' };
+    }],
+    ['🌐', 'Kết nối mạng', 'Đang kiểm tra kết nối...', async () => {
+      await detectServer();
+      if (!navigator.onLine) return { ok: true, note: 'Đang offline: bài học, ôn tập vẫn dùng được; tính năng AI sẽ chờ có mạng.' };
+      return { ok: true, note: server.online ? `Đã kết nối máy chủ EngMate${server.ai ? ' (có gia sư AI)' : ''}.` : 'Đã có mạng. Đang chạy bản web (không cần máy chủ riêng).' };
+    }],
+    ['🧩', 'Toàn vẹn dữ liệu học tập', 'Đang đọc và kiểm tra dữ liệu học...', async () => {
       const raw = localStorage.getItem(STORE);
-      if (raw) JSON.parse(raw); // ném lỗi nếu dữ liệu hỏng
-      const n = Object.keys(state.srs).length;
-      return { ok: true, note: raw ? `${Object.keys(state.completed).length} bài đã học · ${n} thẻ từ` : 'Bắt đầu dữ liệu mới' };
-    });
-    await run(4, async () => {
+      try { if (raw) JSON.parse(raw); } catch {
+        return { ok: false, note: 'Lỗi: dữ liệu học trên máy bị hỏng. Hãy khôi phục từ bản sao lưu (Cài đặt → Khôi phục).' };
+      }
+      return { ok: true, note: raw ? `${Object.keys(state.completed).length} bài đã học · ${Object.keys(state.srs).length} thẻ từ vựng.` : 'Chưa có dữ liệu cũ, bắt đầu hồ sơ mới.' };
+    }],
+    ['🗣️', 'Tải trước bài học & giọng đọc', 'Đang nạp bài học, từ vựng và giọng đọc...', async () => {
       if ('speechSynthesis' in window) speechSynthesis.getVoices();
       const words = new Set(LESSONS.flatMap(l => l.vocab.map(v => v.en))).size;
-      detectServer();
-      return { ok: LESSONS.length > 0, note: `${LESSONS.length} bài học · ${words} từ vựng` };
-    });
-    await run(5, async () => ({ ok: a.role === 'learner', note: a.role === 'learner' ? 'Được phép học' : 'Tài khoản không có quyền học' }));
-  } catch (e) {
-    await pause(700);
-    return viewLogin(e.message);
+      return LESSONS.length ? { ok: true, note: `${LESSONS.length} bài học · ${words} từ vựng sẵn sàng.` }
+        : { ok: false, note: 'Lỗi: không tải được nội dung bài học. Hãy tải lại trang.' };
+    }],
+    ['🎓', 'Quyền vào Phân hệ Học tập', 'Đang kiểm tra quyền truy cập...', async () =>
+      a.role === 'learner' ? { ok: true, note: 'Tài khoản học viên được phép vào học.' }
+        : { ok: false, note: 'Lỗi: tài khoản này không có quyền vào Phân hệ Học tập.' }],
+  ];
+
+  view.innerHTML = `<div class="auth-wrap"><div class="auth-logo spin" id="bt-logo">🦉</div>
+    <h1 style="text-align:center;margin-bottom:4px" id="bt-title">Đang kiểm tra đầu vào...</h1>
+    <p class="muted small" style="text-align:center;margin-top:0" id="bt-now">Chuẩn bị</p>
+    <div class="progress" style="margin:12px 0"><div id="bt-bar" style="width:0%"></div></div>
+    <div class="card" role="list" aria-label="Các bước kiểm tra">${steps.map(([i, t], k) => `<div class="boot-step pending" role="listitem" id="bt-${k}">
+      <span class="bs-st" aria-hidden="true">${i}</span>
+      <div class="grow"><b>${t}</b><div class="bs-note small">Đang chờ</div></div></div>`).join('')}</div>
+    <div class="feedback" id="bt-sum" hidden></div>
+    <button class="btn block" id="bt-go" disabled style="margin-top:10px">🔒 Tiếp tục vào App Học tập</button>
+    <div class="row" id="bt-fix" hidden style="margin-top:8px"></div></div>`;
+  const pause = ms => new Promise(r => setTimeout(r, ms));
+  const setRow = (k, cls, note) => {
+    const el = $(`#bt-${k}`);
+    el.className = `boot-step ${cls}`;
+    $('.bs-st', el).textContent = { doing: '', ok: '✔', fail: '✖', skip: '–' }[cls] ?? steps[k][0];
+    $('.bs-note', el).textContent = note;
+  };
+
+  let failed = null;
+  for (let k = 0; k < steps.length; k++) {
+    const [, title, running, fn] = steps[k];
+    if (failed) { setRow(k, 'skip', 'Bỏ qua vì bước trước bị lỗi.'); continue; }
+    setRow(k, 'doing', running);
+    $('#bt-now').textContent = title + '...';
+    const t0 = performance.now();
+    let res;
+    try { res = await fn(); } catch (e) { res = { ok: false, note: `Lỗi: ${e.message || 'không rõ nguyên nhân'}.` }; }
+    await pause(Math.max(0, 420 - (performance.now() - t0))); // để kịp nhìn thấy từng bước
+    setRow(k, res.ok ? 'ok' : 'fail', res.note);
+    $('#bt-bar').style.width = `${Math.round(100 * (k + 1) / steps.length)}%`;
+    if (!res.ok) failed = { k, ...res };
   }
+  $('#bt-logo').classList.remove('spin');
+  const sum = $('#bt-sum'), go = $('#bt-go'), fix = $('#bt-fix');
+  sum.hidden = false;
+
+  if (failed) {
+    $('#bt-bar').style.background = 'var(--bad)';
+    $('#bt-title').textContent = 'Chưa thể vào học';
+    $('#bt-now').textContent = 'Có bước kiểm tra bị lỗi, xem giải thích màu đỏ bên trên.';
+    sum.className = 'feedback bad';
+    sum.textContent = `✖ ${steps[failed.k][1]}: ${failed.note.replace(/^Lỗi: /, '')}`;
+    fix.hidden = false;
+    fix.innerHTML = `<button class="btn sm" id="bt-retry">🔄 Thử lại</button>${failed.fix === 'reset' ? '<button class="btn sm ghost" id="bt-reset">🔑 Khôi phục tài khoản</button>' : ''}`;
+    $('#bt-retry').onclick = () => viewLogin();
+    if ($('#bt-reset')) $('#bt-reset').onclick = resetAccount;
+    $(`#bt-${failed.k}`).scrollIntoView({ block: 'center', behavior: 'smooth' });
+    return;
+  }
+
   authed = true;
   if (!state.profile.name) { state.profile.name = a.user; save(); }
-  $('#bt-now').textContent = state.profile.onboarded ? 'Vào Phân hệ Học tập 🎓' : 'Tiếp theo: Kiểm tra đầu vào 📝';
-  await pause(500);
-  // Người mới: màn chào mừng (tên, lứa tuổi) → Kiểm tra đầu vào; người cũ: vào thẳng trang học.
-  if (location.hash === '#/home') router(); else location.hash = '#/home';
+  $('#bt-title').textContent = 'Kiểm tra hoàn tất ✔';
+  sum.className = 'feedback ok';
+  sum.textContent = `✔ Cả ${steps.length}/${steps.length} bước đều đạt. ${state.profile.onboarded ? 'Sẵn sàng vào Phân hệ Học tập.' : 'Tiếp theo: làm quen và kiểm tra trình độ đầu vào.'}`;
+  go.disabled = false;
+  go.textContent = '🎓 Tiếp tục vào App Học tập';
+  const enter = () => {
+    clearInterval(timer);
+    // Người mới: màn chào mừng (tên, lứa tuổi) → Kiểm tra đầu vào; người cũ: vào thẳng trang học.
+    if (location.hash === '#/home') router(); else location.hash = '#/home';
+  };
+  let left = 3;
+  $('#bt-now').textContent = `Tự vào học sau ${left} giây...`;
+  const timer = setInterval(() => { if (--left <= 0) enter(); else if ($('#bt-now')) $('#bt-now').textContent = `Tự vào học sau ${left} giây...`; }, 1000);
+  go.onclick = enter;
+  window.addEventListener('hashchange', () => clearInterval(timer), { once: true });
 }

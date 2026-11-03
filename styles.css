@@ -345,7 +345,19 @@ details.card summary { cursor: pointer; }
 @keyframes auth-bob { 50% { transform: translateY(-8px) rotate(-6deg); } }
 .auth-pass { display: flex; gap: 8px; align-items: center; } .auth-pass input { flex: 1; }
 .auth-meter { height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 8px; } .auth-meter div { height: 100%; width: 0; transition: width .3s, background .3s; }
-.boot-step { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); opacity: .5; transition: opacity .3s; }
-.boot-step:last-child { border: none; } .boot-step.doing, .boot-step.ok, .boot-step.fail { opacity: 1; }
-.boot-step .bs-ico { font-size: 1.2rem; } .boot-step.fail .grow { color: var(--bad); }
 @media (prefers-reduced-motion: reduce) { .auth-logo.spin { animation: none; } }
+/* Bảng kiểm tra trực quan: xám = chờ, vàng = đang kiểm tra, xanh = đạt, đỏ = lỗi */
+.boot-step { display: flex; align-items: flex-start; gap: 12px; padding: 10px 6px; border-bottom: 1px solid var(--line); border-radius: 10px; transition: background .3s, color .3s; }
+.boot-step:last-child { border-bottom: none; }
+.boot-step .bs-st { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 15px; font-weight: 800; background: var(--line); color: var(--muted); }
+.boot-step .bs-note { color: var(--muted); font-weight: 600; margin-top: 2px; }
+.boot-step.pending, .boot-step.skip { opacity: .55; }
+.boot-step.doing .bs-st { background: none; border: 3px solid #fde68a; border-top-color: #f59e0b; animation: bs-spin .8s linear infinite; }
+.boot-step.doing .bs-note { color: #b45309; }
+.boot-step.ok .bs-st { background: #16a34a; color: #fff; }
+.boot-step.ok .bs-note { color: var(--ok); }
+.boot-step.fail { background: var(--bad-soft); }
+.boot-step.fail .bs-st { background: #dc2626; color: #fff; }
+.boot-step.fail b, .boot-step.fail .bs-note { color: var(--bad); }
+@keyframes bs-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .boot-step.doing .bs-st { animation: none; } }

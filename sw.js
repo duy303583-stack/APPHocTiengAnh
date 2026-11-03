@@ -1,5 +1,5 @@
 // Lưu giao diện để học offline. Tăng VERSION mỗi khi sửa file giao diện.
-const VERSION = 'engmate-v16';
+const VERSION = 'engmate-v17';
 const SHELL = ['./', 'index.html', 'gioi-thieu.html', 'app.html', 'ai-tutor.html', 'demo01.html', 'demo02.html', 'demo03.html', 'styles.css', 'manifest.json', 'icon.svg', 'js/app.js', 'js/data.js', 'js/ai.js', 'js/listen.js', 'js/interpret.js', 'js/auth.js', 'js/prompts.js', 'js/demo-switcher.js'];
 
 self.addEventListener('install', e => {
